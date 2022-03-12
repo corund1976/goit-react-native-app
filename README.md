@@ -35,11 +35,13 @@
 
 1. expo-camera - предоставляет методы работы с камерой
    expo install expo-camera
-2. expo-media-library - предоставляет методы для сохранения фото в память телефона
+2. expo-image-picker provides access to the system's UI for selecting images and videos from the phone's library or taking a photo with the camera.
+   expo install expo-image-picker
+3. expo-media-library - предоставляет методы для сохранения фото в память телефона
    expo install expo-media-library
-3. пакет под названием expo-location для определения местоположения пользователя
+4. пакет под названием expo-location для определения местоположения пользователя
    expo install expo-location
-4. показывать карту с маркерами можно добавив в проект пакет под названием react-native-maps
+5. показывать карту с маркерами можно добавив в проект пакет под названием react-native-maps
    expo install react-native-maps
 
 ---
@@ -60,6 +62,7 @@
 # Redux и Firebase
 
 1. Далее нужно установить Firebase в проект к react-native
+   npm i firebase@9.1.0
    expo install firebase
-2. Redux Toolkit is available as a package on NPM for use with a module bundler or in a Node application:
-   npm install @reduxjs/toolkit
+2. Add the Redux Toolkit and React-Redux packages to your project.
+   npm install @reduxjs/toolkit react-redux
