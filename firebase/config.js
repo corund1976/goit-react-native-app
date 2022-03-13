@@ -9,13 +9,12 @@ import "firebase/compat/storage";
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   // apiKey: REACT_APP_KEY_FIREBASE,
-  apiKey: "AIzaSyBfYM3ZQcGKrrrjUdpwvcUHT4u0GWh3SWQ",
-  authDomain: "goit-react-native-app.firebaseapp.com",
-  databaseURL: "https://goit-react-native-app-default-rtdb.firebaseio.com",
-  projectId: "goit-react-native-app",
-  storageBucket: "goit-react-native-app.appspot.com",
-  messagingSenderId: "180961808722",
-  appId: "1:180961808722:web:5b131e13ce0a5328d7aa8b"
+  apiKey: "AIzaSyBDGWPt6pB-xwja4Gvnj28dmP3EK5qncaw",
+  authDomain: "goit-react-native-app-6825f.firebaseapp.com",
+  projectId: "goit-react-native-app-6825f",
+  storageBucket: "goit-react-native-app-6825f.appspot.com",
+  messagingSenderId: "555308641992",
+  appId: "1:555308641992:web:4ac35afeba24569e967ffd"
 };
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);

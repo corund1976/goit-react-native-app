@@ -53,7 +53,7 @@ export function PostsScreen ({ route, navigation }) {
                 onPress={() =>
                   navigation.navigate('Comments', { id: item.id })}
               >
-                <Feather name='message-circle' size={24} color={'#BDBDBD'} style={ {marginRight: 6}}/>
+                <Feather name='message-circle' size={24} color={'#BDBDBD'} style={{ marginRight: 6 }} />
                 <Text style={styles.numberComments}>66</Text>
               </TouchableOpacity>
 
@@ -62,7 +62,7 @@ export function PostsScreen ({ route, navigation }) {
                 onPress={() =>
                   navigation.navigate('Map', { location: item.location })}
               >
-                <Feather name='map-pin' size={24} color={'#BDBDBD'} style={ {marginRight: 4}}/>
+                <Feather name='map-pin' size={24} color={'#BDBDBD'} style={{ marginRight: 4 }} />
                 {item.location
                   ?
                     <Text style={styles.locationLink}>{item.location}</Text>
