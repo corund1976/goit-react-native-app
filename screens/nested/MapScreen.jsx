@@ -18,7 +18,7 @@ export function MapScreen ({ route }) {
         }}
       >
         <Marker
-          title={location.locationName}
+          title={location.location}
           coordinate={{
             latitude: location.latitude,
             longitude: location.longitude,

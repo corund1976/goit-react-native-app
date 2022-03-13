@@ -62,7 +62,21 @@
 # Redux и Firebase
 
 1. Далее нужно установить Firebase в проект к react-native
-   npm i firebase@9.1.0
-   expo install firebase
-2. Add the Redux Toolkit and React-Redux packages to your project.
+   npm i firebase@9.1.0 (expo install firebase)
+
+2. Добавить в "FireStore DataBase" -> "Rules" строку
+   "allow read, write: if request.auth != null;". Теперь файл должен выглядеть так:
+
+   rules_version = '2';
+   service cloud.firestore {
+   match /databases/{database}/documents {
+   match /{document=\*\*} {
+   allow read, write: if
+   request.time < timestamp.date(2022, 4, 16);
+   allow read, write: if request.auth != null;
+   }
+   }
+   }
+
+3. Add the Redux Toolkit and React-Redux packages to your project.
    npm install @reduxjs/toolkit react-redux

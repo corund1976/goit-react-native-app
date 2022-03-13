@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image, ActivityIndicator } from 'react-native';
 import { useSelector } from 'react-redux';
 
 import { Feather } from '@expo/vector-icons';
@@ -63,11 +63,11 @@ export function PostsScreen ({ route, navigation }) {
                   navigation.navigate('Map', { location: item.location })}
               >
                 <Feather name='map-pin' size={24} color={'#BDBDBD'} style={ {marginRight: 4}}/>
-                {item.locationName
+                {item.location
                   ?
-                    <Text style={styles.locationLink}>{item.locationName}</Text>
+                    <Text style={styles.locationLink}>{item.location}</Text>
                   :
-                    <Text style={styles.locationLink}>{item.location.latitude} {item.location.longitude}</Text>
+                    <Text style={styles.locationLink}>{item.latitude} {item.longitude}</Text>
                 }
               </TouchableOpacity>
             </View>

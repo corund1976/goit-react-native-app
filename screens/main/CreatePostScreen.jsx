@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, TextInput, Image, Alert } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, TextInput, Image, Alert, ActivityIndicator } from 'react-native';
 
 import { Camera } from 'expo-camera';
 import * as Location from 'expo-location';
@@ -14,11 +14,9 @@ import { storage, firestore } from '../../firebase/config';
 const initialState = {
   photo: null,
   description: '',
-  locationName: '',
-  // location: {
-  //   latitude: null,
-  //   longitude: null,
-  // }
+  location: '',
+  // latitude: null,
+  // longitude: null,
 }
 
 export const CreatePostScreen = ({ navigation }) => {
@@ -31,7 +29,9 @@ export const CreatePostScreen = ({ navigation }) => {
 
   const [cameraRef, setCameraRef] = useState(null);
   const [typeCamera, setTypeCamera] = useState(Camera.Constants.Type.back);
-  
+
+  const [isLoading, setIsLoading] = useState(false);
+     
   const { userId, userName } = useSelector(state => state.auth);
 
   useEffect(() => {
@@ -89,14 +89,15 @@ export const CreatePostScreen = ({ navigation }) => {
   }
   
   const locationInputHandler = (text) => {
-    setState((prevState) => ({ ...prevState, locationName: text, }))
+    setState((prevState) => ({ ...prevState, location: text, }))
   }
 
   const publishPhoto = async () => {
-    // console.log('При нажатии на Publish стейт имеет вид:', state);
     uploadPostToServer();
-    // navigation.navigate('Posts', state);
-    // setState(initialState);
+    if (!isLoading) {
+      // navigation.navigate('Posts', state);
+      // setState(initialState);
+    }
   }
 
   const uploadPhotoToServer = async () => {
@@ -113,50 +114,52 @@ export const CreatePostScreen = ({ navigation }) => {
       .child(`${id}`)
       .getDownloadURL();
     
-    console.log('-----------------processedPhoto-----------------------------', processedPhotoURL);
-
     return processedPhotoURL;
   }
 
   const uploadPostToServer = async () => {
+    setIsLoading(true);
+
     const photo = await uploadPhotoToServer();
-    const { description, locationName } = state;
-    const { coords } = await Location.getCurrentPositionAsync({});
-    // const location = {
-    //   latitude: coords.latitude,
-    //   longitude: coords.longitude,
-    // };
-    console.log('photo', photo);
-    console.log('description', description);
-    console.log('locationName', locationName);
-    console.log('coords', coords);
-    // console.log('location', location);
-    console.log('userId', userId);
-    console.log('userName', userName);
+    const { description, location } = state;
+    const { coords: { latitude, longitude } } = await Location.getCurrentPositionAsync({});
+
+    console.log('photo:', photo);
+    console.log('description:', description);
+    console.log('location:', location);
+    console.log('latitude:', latitude);
+    console.log('longitude:', longitude);
+    console.log('userId:', userId);
+    console.log('userName:', userName);
+
+    setIsLoading(false);
 
     const createPost = await firestore
-      .collection('posts')
+      .collection("posts")
       .add({
         photo,
         description,
-        locationName,
-        location: coords,
-        // locationLatitude: coords.latitude,
-        // locationLongitude: coords.longitude,
+        location,
+        latitude,
+        longitude,
         userId,
         userName
       });
     
+
     console.log('{*} ===> uploadPostToServer ===> createPost', createPost);
     return createPost;
   };
   
-  const deletePhoto = () => {
-    setState((prevState) => ({ ...prevState, photo: null }))
+  const deletePost = () => {
+    setState(initialState)
   }
 
   return (
     <View style={styles.container}>
+      {isLoading &&
+        <ActivityIndicator size='large' style={styles.isloading} />
+      }
       <View style={{ ...styles.cameraContainer, borderColor: state.photo ? '#000000' : '#E8E8E8' }}>
         <Camera
           style={styles.camera}
@@ -208,7 +211,7 @@ export const CreatePostScreen = ({ navigation }) => {
           activeOpacity={0.8}
         >
           <Text style={styles.txtUnderCamera}>
-            Загрузите фото
+            Загрузить фото из галереи
           </Text>
         </TouchableOpacity>
       )}
@@ -237,7 +240,7 @@ export const CreatePostScreen = ({ navigation }) => {
         <TextInput
           placeholder='Местность...'
           placeholderTextColor='#BDBDBD'
-          value={state.locationName}
+          value={state.location}
           onChangeText={locationInputHandler}
           style={styles.inputLocation}
         />
@@ -256,7 +259,7 @@ export const CreatePostScreen = ({ navigation }) => {
       </TouchableOpacity>
 
       <TouchableOpacity
-        onPress={deletePhoto}
+        onPress={deletePost}
         style={styles.deleteBtnContainer}
         activeOpacity={0.8}
       >
@@ -270,6 +273,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor:'#ffffff',
+  },
+  isloading: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
   },
   cameraContainer: {
     borderWidth: 1,
