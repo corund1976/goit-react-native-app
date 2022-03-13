@@ -75,12 +75,14 @@ export const CreatePostScreen = ({ navigation }) => {
       quality: 1,
     });
 
-    console.log('CreatePostScreen -> #73 imageFromGallery=', imageFromGallery);
-
     if (!imageFromGallery.cancelled) {
       setState(prevState => ({ ...prevState, photo: imageFromGallery.uri }));
     }
   };
+
+  const editPhoto = () => {
+    setState(prevState => ({ ...prevState, photo: null }));
+  }
 
   const descriptionInputHandler = (text) => {
     setState((prevState) => ({ ...prevState, description: text }))
@@ -212,9 +214,14 @@ export const CreatePostScreen = ({ navigation }) => {
       )}
 
       {state.photo && (
-        <Text style={styles.txtUnderCamera}>
-          Редактировать фото
-        </Text>
+        <TouchableOpacity
+          onPress={editPhoto}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.txtUnderCamera}>
+            Редактировать фото
+          </Text>
+        </TouchableOpacity>
       )}
 
       <TextInput
