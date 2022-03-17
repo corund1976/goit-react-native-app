@@ -10,6 +10,9 @@ import { Feather, MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { useSelector } from 'react-redux';
 
 import { storage, firestore } from '../../firebase/config';
+// import { collection } from "firebase/firestore";
+// import { ref } from "firebase/storage";
+
 
 const initialState = {
   photo: null,
@@ -105,15 +108,10 @@ export const CreatePostScreen = ({ navigation }) => {
     const file = await response.blob();
     const id = Date.now().toString();
 
-    await storage
-      .ref(`images/${id}`)
-      .put(file);
+    await storage.ref(`images/${id}`).put(file);
 
-    const processedPhotoURL = await storage
-      .ref('images')
-      .child(`${id}`)
-      .getDownloadURL();
-    
+    const processedPhotoURL = await storage.ref('images').child(`${id}`).getDownloadURL();
+    console.log('!!!! photo uploaded successful !!!!');
     return processedPhotoURL;
   }
 
@@ -134,9 +132,7 @@ export const CreatePostScreen = ({ navigation }) => {
 
     setIsLoading(false);
 
-    const createPost = await firestore
-      .collection("posts")
-      .add({
+    const createPost = await firestore.collection("posts").add({
         photo,
         description,
         location,
@@ -146,7 +142,6 @@ export const CreatePostScreen = ({ navigation }) => {
         userName
       });
     
-
     console.log('{*} ===> uploadPostToServer ===> createPost', createPost);
     return createPost;
   };
