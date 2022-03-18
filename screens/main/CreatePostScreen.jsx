@@ -95,7 +95,7 @@ export const CreatePostScreen = ({ navigation }) => {
     await uploadPostToServer();
 
     if (!isLoading) {
-      navigation.navigate('Posts', state);
+      navigation.navigate('Posts');
       setState(initialState);
     }
   }

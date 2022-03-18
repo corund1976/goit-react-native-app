@@ -4,17 +4,25 @@ import { useSelector } from 'react-redux';
 
 import { Feather } from '@expo/vector-icons';
 
+import { db } from '../../firebase/config';
+
 export function PostsScreen ({ route, navigation }) {
   console.log('****** PostsScreen *******');
   console.log('HomeScreen, route.params -->', route.params);
 
   const [posts, setPosts] = useState([])
 
+  const getAllPosts = async () => {
+    await db
+      .collection('posts')
+      .onSnapshot((data) => {
+        setPosts(data.docs.map((doc) => ({ ...doc.data(), id: doc.id, })));
+      })
+  }
+  
   useEffect(() => {
-    if (route.params) {
-      setPosts(prevState => ([...prevState, route.params]));
-    }
-  }, [route.params]);
+    getAllPosts();
+  }, []);
 
   const { userAvatar, userName, userEmail } = useSelector(state => state.auth);
   

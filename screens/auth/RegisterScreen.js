@@ -6,7 +6,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { useDispatch } from 'react-redux';
 
 import { authSignUpUser } from '../../redux/auth/authOperations';
-import { storage } from '../../firebase/config';
 
 const defaultAvatar = '../../assets/images/default-avatar.png';
 
@@ -39,22 +38,10 @@ export function RegisterScreen({ navigation }) {
     });
     
     if (!avatarFromGallery.cancelled) {
-      // setState(prevState => ({ ...prevState, avatar: avatarFromGallery.uri }));
-      await uploadAvatarToStorage(avatarFromGallery.uri);
+      setState(prevState => ({ ...prevState, avatar: avatarFromGallery.uri }));
     }
   };
-  
-  const uploadAvatarToStorage = async (avatar) => {
-    const response = await fetch(avatar);
-    const file = await response.blob();
-    const id = Date.now().toString();
     
-    await storage.ref(`avatars/${id}`).put(file);
-    
-    const processedAvatarURL = await storage.ref('avatars').child(`${id}`).getDownloadURL();
-    setState(prevState => ({ ...prevState, avatar: processedAvatarURL }));
-  }
-  
   const avatarDelete = () => {
     setState(prevState => ({ ...prevState, avatar: null }))
   };
@@ -76,7 +63,6 @@ export function RegisterScreen({ navigation }) {
 
   const handleSubmit = async () => {
     hideKeyboard();
-    // await uploadAvatarToStorage();
     dispatch(authSignUpUser(state));
     setState(initialState);     
   }

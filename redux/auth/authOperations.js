@@ -1,7 +1,9 @@
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
+// import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
 
 import { authSlice } from './authReducer';
 import { auth } from "../../firebase/config";
+
+import { storage } from '../../firebase/config';
 
 const { updateUserProfile, updateUserAvatar, changeAuthStatus, signOutUser } = authSlice.actions;
 
@@ -10,10 +12,23 @@ export const authSignUpUser = ({ avatar, name, email, password }) =>
     try {
       await auth.createUserWithEmailAndPassword(email, password);
 
+      const uploadAvatarToStorage = async () => {
+        const response = await fetch(avatar);
+        const file = await response.blob();
+        const id = Date.now().toString();
+        
+        await storage.ref(`avatars/${id}`).put(file);
+        
+        const result = await storage.ref('avatars').child(`${id}`).getDownloadURL();
+        return result;
+      }
+
+      const processedAvatarURL = await uploadAvatarToStorage();
+
       const user = await auth.currentUser;
 
       await user.updateProfile({
-        photoURL: avatar,
+        photoURL: processedAvatarURL,
         displayName: name,
       })
 
@@ -90,12 +105,25 @@ export const changeAuthStatusUser = () =>
     });
   };
 
-export const changeAvatarUser = ( newAvatar ) =>
+export const changeAvatarUser = ( avatar ) =>
   async (dispatch, getState) => {
+    const uploadAvatarToStorage = async () => {
+      const response = await fetch(avatar);
+      const file = await response.blob();
+      const id = Date.now().toString();
+      
+      await storage.ref(`avatars/${id}`).put(file);
+      
+      const result = await storage.ref('avatars').child(`${id}`).getDownloadURL();
+      return result;
+    }
+
+    const processedAvatarURL = await uploadAvatarToStorage();
+
     const user = await auth.currentUser;
 
     await user.updateProfile({
-      photoURL: newAvatar,
+      photoURL: processedAvatarURL,
     })
     
     dispatch(updateUserAvatar({ avatar: user.photoURL }));

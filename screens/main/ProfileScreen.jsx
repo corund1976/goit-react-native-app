@@ -6,6 +6,8 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { authSignOutUser, changeAvatarUser } from '../../redux/auth/authOperations';
 
+const defaultAvatar = '../../assets/images/default-avatar.png';
+
 export function ProfileScreen() {
   console.log('******ProfileScreen*******');
   const dispatch = useDispatch();
@@ -53,7 +55,11 @@ export function ProfileScreen() {
           
           {/* Аватарка */}
           <View style={styles.avatarContainer}>
-            <Image style={styles.avatar} source={{ uri: avatar }} />
+            <Image
+              style={styles.avatar}
+              source={avatar ? { uri: avatar } : require(defaultAvatar) }
+            />
+
             {/* Кнопка Добавить/Удалить аватар */}
               <TouchableOpacity
                 style={styles.avatarButton}
