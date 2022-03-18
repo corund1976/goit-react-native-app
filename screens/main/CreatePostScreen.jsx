@@ -1,14 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, TextInput, Image, Alert, ActivityIndicator } from 'react-native';
-
 import { Camera } from 'expo-camera';
 import * as Location from 'expo-location';
 import * as ImagePicker from 'expo-image-picker';
-
 import { Feather, MaterialIcons, Ionicons } from '@expo/vector-icons';
-
 import { useSelector } from 'react-redux';
-
 import { storage, db } from '../../firebase/config';
 // import { collection } from "firebase/firestore";
 // import { ref } from "firebase/storage";

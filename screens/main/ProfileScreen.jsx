@@ -6,14 +6,8 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { authSignOutUser, changeAvatarUser } from '../../redux/auth/authOperations';
 
-// const initialState = {
-//   avatar: null,
-//   name: '',
-// }
-
 export function ProfileScreen() {
   console.log('******ProfileScreen*******');
-
   const dispatch = useDispatch();
   const { userAvatar, userName } = useSelector(state => state.auth);
 

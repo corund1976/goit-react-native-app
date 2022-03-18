@@ -1,22 +1,14 @@
-import React, {useState} from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  TextInput,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  KeyboardAvoidingView,
-  Platform,
-  Keyboard,
-  Image,
-  ImageBackground
-} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, TouchableWithoutFeedback, KeyboardAvoidingView, Platform, Keyboard, Image, ImageBackground } from 'react-native';
+
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 import { useDispatch } from 'react-redux';
 
 import { authSignUpUser } from '../../redux/auth/authOperations';
+import { storage } from '../../firebase/config';
+
+const defaultAvatar = '../../assets/images/default-avatar.png';
 
 const initialState = {
   avatar: null,
@@ -26,6 +18,7 @@ const initialState = {
 }
 
 export function RegisterScreen({ navigation }) {
+  console.log('******RegisterScreen*******');
   const dispatch = useDispatch()
 
   const [state, setState] = useState(initialState)
@@ -38,21 +31,31 @@ export function RegisterScreen({ navigation }) {
 
   const avatarAdd = async () => {
     // No permissions request is necessary for launching the image library
-    let imageFromGallery = await ImagePicker.launchImageLibraryAsync({
+    let avatarFromGallery = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
     });
-
-    console.log('RegisterScreen -> #47 imageFromGallery=', imageFromGallery);
-
-    if (!imageFromGallery.cancelled) {
-      setState(prevState => ({ ...prevState, avatar: imageFromGallery.uri }));
+    
+    if (!avatarFromGallery.cancelled) {
+      // setState(prevState => ({ ...prevState, avatar: avatarFromGallery.uri }));
+      await uploadAvatarToStorage(avatarFromGallery.uri);
     }
   };
   
-  const avatarDelete= () => {
+  const uploadAvatarToStorage = async (avatar) => {
+    const response = await fetch(avatar);
+    const file = await response.blob();
+    const id = Date.now().toString();
+    
+    await storage.ref(`avatars/${id}`).put(file);
+    
+    const processedAvatarURL = await storage.ref('avatars').child(`${id}`).getDownloadURL();
+    setState(prevState => ({ ...prevState, avatar: processedAvatarURL }));
+  }
+  
+  const avatarDelete = () => {
     setState(prevState => ({ ...prevState, avatar: null }))
   };
 
@@ -71,16 +74,13 @@ export function RegisterScreen({ navigation }) {
     Keyboard.dismiss();
   }
 
-  const handleSubmit = () => {
-    setShowKeyboard(false);
-    Keyboard.dismiss();
-
-    console.log('RegisterScreen -> #78 - state Register ----->', state);
-
-    dispatch(authSignUpUser(state))
-    setState(initialState);
+  const handleSubmit = async () => {
+    hideKeyboard();
+    // await uploadAvatarToStorage();
+    dispatch(authSignUpUser(state));
+    setState(initialState);     
   }
-
+  
   const onFocusNameInput = () => {
     setShowKeyboard(true);
     setFocusNameInput(true);
@@ -123,7 +123,10 @@ export function RegisterScreen({ navigation }) {
               
             {/* Аватарка */}
             <View style={styles.avatarContainer}>
-              <Image style={styles.avatar} source={{ uri: state.avatar }} />
+              <Image
+                style={styles.avatar}
+                source={state.avatar ? { uri: state.avatar } : require(defaultAvatar) }
+              />
 
               {/* Кнопка Добавить/Удалить аватар */}
                 <TouchableOpacity

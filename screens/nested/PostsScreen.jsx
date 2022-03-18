@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 import { Feather } from '@expo/vector-icons';
 
 export function PostsScreen ({ route, navigation }) {
-  console.log('******HomeScreen*******');
+  console.log('****** PostsScreen *******');
   console.log('HomeScreen, route.params -->', route.params);
 
   const [posts, setPosts] = useState([])
