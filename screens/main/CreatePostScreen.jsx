@@ -96,10 +96,11 @@ export const CreatePostScreen = ({ navigation }) => {
   }
 
   const publishPhoto = async () => {
-    uploadPostToServer();
+    await uploadPostToServer();
+
     if (!isLoading) {
-      // navigation.navigate('Posts', state);
-      // setState(initialState);
+      navigation.navigate('Posts', state);
+      setState(initialState);
     }
   }
 
@@ -139,13 +140,13 @@ export const CreatePostScreen = ({ navigation }) => {
       userName
     }
 
-    console.log('newPost:', newPost);
-
-    setIsLoading(false);
+    console.log('!!!! created newPost:', newPost);
 
     const createPost = await db.collection("posts").add(newPost);    
-        
-    console.log('{*} ===> uploadPostToServer ===> createPost', createPost);
+    
+    setIsLoading(false);
+
+    console.log('!!!! post uploaded to Firebase :', createPost);
 
     return createPost;
   };
