@@ -9,7 +9,7 @@ import { Feather, MaterialIcons, Ionicons } from '@expo/vector-icons';
 
 import { useSelector } from 'react-redux';
 
-import { storage, firestore } from '../../firebase/config';
+import { storage, db } from '../../firebase/config';
 // import { collection } from "firebase/firestore";
 // import { ref } from "firebase/storage";
 
@@ -17,7 +17,7 @@ import { storage, firestore } from '../../firebase/config';
 const initialState = {
   photo: null,
   description: '',
-  location: '',
+  locality: '',
   // latitude: null,
   // longitude: null,
 }
@@ -91,8 +91,8 @@ export const CreatePostScreen = ({ navigation }) => {
     setState((prevState) => ({ ...prevState, description: text }))
   }
   
-  const locationInputHandler = (text) => {
-    setState((prevState) => ({ ...prevState, location: text, }))
+  const localityInputHandler = (text) => {
+    setState((prevState) => ({ ...prevState, locality: text, }))
   }
 
   const publishPhoto = async () => {
@@ -104,6 +104,8 @@ export const CreatePostScreen = ({ navigation }) => {
   }
 
   const uploadPhotoToServer = async () => {
+    console.log('!!!! start uploading photo to Storage !!!!');
+
     const response = await fetch(state.photo);
     const file = await response.blob();
     const id = Date.now().toString();
@@ -111,7 +113,7 @@ export const CreatePostScreen = ({ navigation }) => {
     await storage.ref(`images/${id}`).put(file);
 
     const processedPhotoURL = await storage.ref('images').child(`${id}`).getDownloadURL();
-    console.log('!!!! photo uploaded successful !!!!');
+    console.log('!!!! photo uploaded to Storage successfully !!!!');
     return processedPhotoURL;
   }
 
@@ -119,30 +121,32 @@ export const CreatePostScreen = ({ navigation }) => {
     setIsLoading(true);
 
     const photo = await uploadPhotoToServer();
-    const { description, location } = state;
+    const { description, locality } = state;
+
+    console.log('!!!! start getting geolocation !!!!');
+
     const { coords: { latitude, longitude } } = await Location.getCurrentPositionAsync({});
 
-    console.log('photo:', photo);
-    console.log('description:', description);
-    console.log('location:', location);
-    console.log('latitude:', latitude);
-    console.log('longitude:', longitude);
-    console.log('userId:', userId);
-    console.log('userName:', userName);
+    console.log('!!!! geolocation is ready !!!!');
+
+    const newPost = {
+      photo,
+      description,
+      locality,
+      latitude,
+      longitude,
+      userId,
+      userName
+    }
+
+    console.log('newPost:', newPost);
 
     setIsLoading(false);
 
-    const createPost = await firestore.collection("posts").add({
-        photo,
-        description,
-        location,
-        latitude,
-        longitude,
-        userId,
-        userName
-      });
-    
+    const createPost = await db.collection("posts").add(newPost);    
+        
     console.log('{*} ===> uploadPostToServer ===> createPost', createPost);
+
     return createPost;
   };
   
@@ -205,7 +209,7 @@ export const CreatePostScreen = ({ navigation }) => {
           onPress={takePhotoGallery}
           activeOpacity={0.8}
         >
-          <Text style={styles.txtUnderCamera}>
+          <Text style={styles.uploadEditButton}>
             Загрузить фото из галереи
           </Text>
         </TouchableOpacity>
@@ -216,7 +220,7 @@ export const CreatePostScreen = ({ navigation }) => {
           onPress={editPhoto}
           activeOpacity={0.8}
         >
-          <Text style={styles.txtUnderCamera}>
+          <Text style={styles.uploadEditButton}>
             Редактировать фото
           </Text>
         </TouchableOpacity>
@@ -231,13 +235,13 @@ export const CreatePostScreen = ({ navigation }) => {
       />
 
       <View>
-        <Feather name='map-pin' size={24} color={'#BDBDBD'} style={styles.locationIcon} />
+        <Feather name='map-pin' size={24} color={'#BDBDBD'} style={styles.iconLocality} />
         <TextInput
           placeholder='Местность...'
           placeholderTextColor='#BDBDBD'
-          value={state.location}
-          onChangeText={locationInputHandler}
-          style={styles.inputLocation}
+          value={state.locality}
+          onChangeText={localityInputHandler}
+          style={styles.inputLocality}
         />
       </View>
 
@@ -281,8 +285,11 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
 
     height: 240,
+    width: 320,
     marginTop: 32,
     marginHorizontal: 16,
+    marginLeft: "auto",
+    marginRight: 'auto',
   },
   camera: {
     flex: 1,
@@ -326,7 +333,7 @@ const styles = StyleSheet.create({
   preview: {
     flex: 1,
   },
-  txtUnderCamera: {
+  uploadEditButton: {
     fontSize: 16,
     lineHeight: 19,
     color: '#bdbdbd',
@@ -346,12 +353,12 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     marginHorizontal: 16,
   },
-  locationIcon: {
+  iconLocality: {
     position: 'absolute',
     top: 13,
     left: 16,
   },
-  inputLocation: {
+  inputLocality: {
     color: '#212121',
     fontSize: 16,
     lineHeight: 19,

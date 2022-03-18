@@ -24,13 +24,14 @@ const firebaseConfig = {
 };
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
+firebase.firestore().settings({ experimentalForceLongPolling: true }); //add this..РЕШЕНИЕ
 // const firebaseApp = initializeApp(firebaseConfig);
 
 const auth = firebase.auth();
 // const auth = getAuth(firebaseApp);
-const firestore = firebase.firestore();
+const db = firebase.firestore();
 // const db = getFirestore(firebaseApp);
 const storage = firebase.storage();
 // const storage = getStorage(firebaseApp);
 
-export { auth, firestore, storage };
+export { auth, db, storage };
