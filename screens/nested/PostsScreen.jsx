@@ -49,31 +49,39 @@ export function PostsScreen ({ route, navigation }) {
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
           <View style={styles.listItem}>
-            <Image
-              source={{ uri: item.photo }}
-              style={styles.image}
-              />
+
+            {/* Фото */}
+            <Image source={{ uri: item.photo }} style={styles.image} />
+                        
+            {/* Описание */}
             <Text style={styles.description}>{item.description}</Text>
 
+            {/* Кнопка Комментарии */}
             <View style={styles.buttonsContainer}>
               <TouchableOpacity
                 style={styles.commentsBtn}
-                onPress={() =>
-                  navigation.navigate('Comments', { id: item.id })}
+                onPress={() => navigation.navigate('Comments', { postId: item.id })}
               >
                 <Feather name='message-circle' size={24} color={'#BDBDBD'} style={{ marginRight: 6 }} />
                 <Text style={styles.numberComments}>66</Text>
               </TouchableOpacity>
 
+              {/* Кнопка Геолокация */}
               <TouchableOpacity
                 style={styles.locationBtn}
-                onPress={() =>
-                  navigation.navigate('Map', { location: item.location })}
+                onPress={() => navigation.navigate('Map', {
+                  location:
+                  {
+                    locality: item.locality,
+                    latitude: item.latitude,
+                    longitude: item.longitude
+                  }
+                })}
               >
                 <Feather name='map-pin' size={24} color={'#BDBDBD'} style={{ marginRight: 4 }} />
-                {item.location
+                {item.locality
                   ?
-                    <Text style={styles.locationLink}>{item.location}</Text>
+                    <Text style={styles.locationLink}>{item.locality}</Text>
                   :
                     <Text style={styles.locationLink}>{item.latitude} {item.longitude}</Text>
                 }

@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-end'
   },
-    bgImage: {
+  bgImage: {
     flex: 1,
     resizeMode: 'cover',
     justifyContent: 'flex-end',

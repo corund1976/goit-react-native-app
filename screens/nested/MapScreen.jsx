@@ -2,8 +2,8 @@ import React from 'react';
 import { StyleSheet, Text, View, Dimensions } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 
-export function MapScreen ({ route }) {
-  console.log('MapScreen , route.params - >', route.params);
+export function MapScreen({ route }) {
+  console.log('*********** MapScreen *********');
   const { location } = route.params;
   console.log('MapScreen , location - >', location);
   return (
@@ -18,7 +18,7 @@ export function MapScreen ({ route }) {
         }}
       >
         <Marker
-          title={location.location}
+          title={location.locality}
           coordinate={{
             latitude: location.latitude,
             longitude: location.longitude,
