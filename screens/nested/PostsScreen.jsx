@@ -6,18 +6,27 @@ import { Feather } from '@expo/vector-icons';
 
 import { db } from '../../firebase/config';
 
-export function PostsScreen ({ route, navigation }) {
+export function PostsScreen ({ navigation }) {
   console.log('****** PostsScreen *******');
-  console.log('HomeScreen, route.params -->', route.params);
 
   const [posts, setPosts] = useState([])
+  
 
-  const getAllPosts = async () => {
-    await db
-      .collection('posts')
-      .onSnapshot((data) => {
-        setPosts(data.docs.map((doc) => ({ ...doc.data(), id: doc.id, })));
+  const getAllPosts = () => {
+    db.collection('posts')
+      .onSnapshot(data => {
+        setPosts(data.docs.map(doc => ({ ...doc.data(), postId: doc.id })))
       })
+  }
+  
+  const numComments = (id) => {
+    let numComments = 0;
+    db.collection(`posts/${id}/comments`)
+        .onSnapshot(data => {
+          numComments = Object.keys(data.docs).length;
+          console.log(Object.keys(data.docs).length);
+        })
+    return numComments;
   }
   
   useEffect(() => {
@@ -25,9 +34,7 @@ export function PostsScreen ({ route, navigation }) {
   }, []);
 
   const { userAvatar, userName, userEmail } = useSelector(state => state.auth);
-  
-  console.log('posts PostScreen -> ', posts);
-  
+   
   return (
     <View style={styles.container}>
       <View style={styles.user}>
@@ -58,12 +65,13 @@ export function PostsScreen ({ route, navigation }) {
 
             {/* Кнопка Комментарии */}
             <View style={styles.buttonsContainer}>
+
               <TouchableOpacity
                 style={styles.commentsBtn}
-                onPress={() => navigation.navigate('Comments', { postId: item.id })}
+                onPress={() => navigation.navigate('Comments', { postId: item.postId, postImage: item.photo })}
               >
                 <Feather name='message-circle' size={24} color={'#BDBDBD'} style={{ marginRight: 6 }} />
-                <Text style={styles.numberComments}>66</Text>
+                <Text style={styles.numberComments}>{numComments(item.postId)}</Text>
               </TouchableOpacity>
 
               {/* Кнопка Геолокация */}
@@ -83,9 +91,10 @@ export function PostsScreen ({ route, navigation }) {
                   ?
                     <Text style={styles.locationLink}>{item.locality}</Text>
                   :
-                    <Text style={styles.locationLink}>{item.latitude} {item.longitude}</Text>
+                    <Text style={styles.locationLink}>{item.latitude.toFixed(4)}  {item.longitude.toFixed(4)}</Text>
                 }
               </TouchableOpacity>
+
             </View>
           </View>
         )}
@@ -114,23 +123,25 @@ const styles = StyleSheet.create({
 
     width: 60,
     height: 60,
+
     marginRight: 8,
-    
   },
   userInfoName: {
     fontWeight: 'bold',
     fontSize: 13,
     lineHeight: 15,
+
     color: '#212121',
   },
   userInfoEmail: {
     fontWeight: 'normal',
     fontSize: 11,
     lineHeight: 13,
+
     color: '#21212180'
   },
   listItem: {
-    alignItems: 'center',
+    // alignItems: 'center',
     justifyContent: 'center',
     
     marginBottom: 32,
@@ -149,32 +160,36 @@ const styles = StyleSheet.create({
   },
 
   buttonsContainer: {
-    // flex: 1,
+    flex: 1,
     flexDirection: 'row',
-    justifyContent: 'space-between'
-    // height: 26
+    justifyContent: "space-between"
   },
 
   commentsBtn: {
     marginRight: 10,
+    maxWidth: '20%',
+
     flexDirection: 'row',
   },
   numberComments: {
     fontWeight: '400',
     fontSize: 16,
     lineHeight: 19,
+
     color: '#BDBDBD',
   },
 
   locationBtn: {
-    maxWidth: '70%',
-    flexDirection: 'row'
+    maxWidth: '80%',
+
+    flexDirection: 'row',
   },
   locationLink: {
     fontWeight: '400',
     fontSize: 16,
     lineHeight: 19,
     textDecorationLine: 'underline',
+
     color: '#212121',
   }
 

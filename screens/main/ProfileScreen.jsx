@@ -1,25 +1,39 @@
 import React, { useState, useEffect } from 'react';
-import { View, ImageBackground, TouchableOpacity, Text, StyleSheet, Image } from 'react-native';
+import { View, ImageBackground, TouchableOpacity, Text, StyleSheet, Image, FlatList } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons, Feather } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { db } from '../../firebase/config';
 import { authSignOutUser, changeAvatarUser } from '../../redux/auth/authOperations';
 
 const defaultAvatar = '../../assets/images/default-avatar.png';
+const BG = '../../assets/images/PhotoBG.png';
 
-export function ProfileScreen() {
+export function ProfileScreen({ navigation }) {
   console.log('******ProfileScreen*******');
   const dispatch = useDispatch();
-  const { userAvatar, userName } = useSelector(state => state.auth);
+  const { userAvatar, userName, userId } = useSelector(state => state.auth);
 
-  const [avatar, setAvatar] = useState(userAvatar)
+  const [avatar, setAvatar] = useState(userAvatar);
+  const [userPosts, setUserPosts] = useState([]);
 
+  useEffect(() => {
+    getAllUserPosts();
+  }, [])
+  
   useEffect(() => {
     if (avatar) {
       dispatch(changeAvatarUser(avatar));
     }
   }, [avatar]);
+
+  const getAllUserPosts = async () => {
+    await db
+      .collection("posts").where("userId", "==", userId)
+      .onSnapshot(data =>
+        setUserPosts(data.docs.map(doc => ({ ...doc.data() }))))
+  }
 
   const avatarAdd = async () => {
     // No permissions request is necessary for launching the image library
@@ -47,9 +61,9 @@ export function ProfileScreen() {
     <View style={styles.container}>
 
       <ImageBackground
-      source={require('../../assets/images/PhotoBG.png')}
-      style={styles.bgImage}
-    >
+        source={require(BG)}
+        style={styles.bgImage}
+      >
 
         <View style={styles.profile}>
           
@@ -88,10 +102,60 @@ export function ProfileScreen() {
             {userName}
           </Text>
 
+          <FlatList
+            data={userPosts}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item }) => (
+              <View style={styles.listItem}>
+
+                {/* Фото */}
+                <Image source={{ uri: item.photo }} style={styles.image} />
+                            
+                {/* Описание */}
+                <Text style={styles.description}>{item.description}</Text>
+
+                {/* Кнопка Комментарии */}
+                <View style={styles.buttonsContainer}>
+
+                  <TouchableOpacity
+                    style={styles.commentsBtn}
+                    onPress={() =>
+                      navigation.navigate('Comments', {
+                        postId: item.id,
+                        postImage: item.photo
+                      })}
+                  >
+                    <Feather name='message-circle' size={24} color={'#BDBDBD'} style={{ marginRight: 6 }} />
+                    <Text style={styles.numberComments}>123456</Text>
+                  </TouchableOpacity>
+
+                  {/* Кнопка Геолокация */}
+                  <TouchableOpacity
+                    style={styles.locationBtn}
+                    onPress={() => navigation.navigate('Map', {
+                      location:
+                      {
+                        locality: item.locality,
+                        latitude: item.latitude,
+                        longitude: item.longitude
+                      }
+                    })}
+                  >
+                    <Feather name='map-pin' size={24} color={'#BDBDBD'} style={{ marginRight: 4 }} />
+                    {item.locality
+                      ?
+                        <Text style={styles.locationLink}>{item.locality}</Text>
+                      :
+                        <Text style={styles.locationLink}>{item.latitude.toFixed(4)}  {item.longitude.toFixed(4)}</Text>
+                    }
+                  </TouchableOpacity>
+
+                </View>
+              </View>
+            )}
+          />
         </View>
-
       </ImageBackground>
-
     </View>
   )
 };
@@ -168,5 +232,57 @@ const styles = StyleSheet.create({
 
     marginBottom: 32,
   },
+  listItem: {
+    // alignItems: 'center',
+    justifyContent: 'center',
+    
+    marginBottom: 32,
+  },
+  image: {
+    borderRadius: 8,
+
+    width: '100%',
+    height: 240,
+
+    marginBottom: 8,
+  },
+  description: {
+    alignSelf: 'flex-start',
+
+  },
+
+  buttonsContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: "space-between"
+  },
+
+  commentsBtn: {
+    marginRight: 10,
+    maxWidth: '20%',
+
+    flexDirection: 'row',
+  },
+  numberComments: {
+    fontWeight: '400',
+    fontSize: 16,
+    lineHeight: 19,
+
+    color: '#BDBDBD',
+  },
+
+  locationBtn: {
+    maxWidth: '80%',
+
+    flexDirection: 'row',
+  },
+  locationLink: {
+    fontWeight: '400',
+    fontSize: 16,
+    lineHeight: 19,
+    textDecorationLine: 'underline',
+
+    color: '#212121',
+  }
 
 });
