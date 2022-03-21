@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image, ActivityIndicator } from 'react-native';
 import { useSelector } from 'react-redux';
-
 import { Feather } from '@expo/vector-icons';
 
 import { db } from '../../firebase/config';
@@ -11,13 +10,13 @@ export function PostsScreen ({ navigation }) {
 
   const [posts, setPosts] = useState([])
   
-  const getAllPosts = () => {
+  const getAllPosts = async () => {
     db.collection('posts')
-      .onSnapshot(data => {
+      .onSnapshot(data =>
         setPosts(data.docs.map(doc => ({ ...doc.data(), postId: doc.id, })))
-      })
-    }
-    
+      )
+  }
+      
   useEffect(() => {
     getAllPosts();
   }, []);
@@ -26,28 +25,38 @@ export function PostsScreen ({ navigation }) {
    
   return (
     <View style={styles.container}>
+
+      {/* Контейнер профиль пользователя */}
       <View style={styles.user}>
+
+        {/* Аватар */}
         <Image
           source={{ uri: userAvatar }}
           style={styles.avatar}
         />
+        
         <View style={styles.userInfo}>
+
+          {/* Имя */}
           <Text style={styles.userInfoName}>
             {userName}
           </Text>
+
+          {/* Email */}
           <Text style={styles.userInfoEmail}>
             {userEmail}
           </Text>
         </View>
       </View>
 
+      {/* Список всех постов приложения */}
       <FlatList
         data={posts}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
           <View style={styles.listItem}>
 
-            {/* Фото */}
+            {/* Фото пост */}
             <Image source={{ uri: item.photo }} style={styles.image} />
                         
             {/* Описание */}
@@ -62,10 +71,14 @@ export function PostsScreen ({ navigation }) {
                   navigation.navigate('Comments', {
                     postId: item.postId,
                     postImage: item.photo,
-                    comments: item.comments ? item.comments : []
+                    postComments: item.comments,
                 })}
               >
-                <Feather name='message-circle' size={24} color={'#BDBDBD'} style={{ marginRight: 6 }} />
+                <Feather name='message-circle' size={24} style={{
+                  marginRight: 6,
+                  color: (item.comments<1) ? '#BDBDBD' : '#FF6C00'
+                }} />
+      
                 <Text style={styles.numberComments}>{item.comments.length}</Text>
               </TouchableOpacity>
 

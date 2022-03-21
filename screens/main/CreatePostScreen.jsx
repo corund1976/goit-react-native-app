@@ -134,7 +134,8 @@ export const CreatePostScreen = ({ navigation }) => {
       longitude,
       userId,
       userName,
-      comments: []
+      comments: [],
+      likes: []
     }
 
     console.log('!!!! created newPost:', newPost);

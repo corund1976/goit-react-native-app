@@ -29,12 +29,30 @@ export function ProfileScreen({ navigation }) {
   }, [avatar]);
 
   const getAllUserPosts = async () => {
-    await db
-      .collection("posts").where("userId", "==", userId)
+    db.collection("posts").where("userId", "==", userId)
       .onSnapshot(data =>
-        setUserPosts(data.docs.map(doc => ({ ...doc.data() }))))
+        setUserPosts(data.docs.map(doc => ({ ...doc.data(), postId: doc.id, })))
+      )
   }
 
+  const like = async (postId, likes) => {
+    console.log('#39', userPosts);
+    const userExist = likes.find(item => {
+      item == userId
+      // console.log('item', item);
+      // console.log('userId', userId);
+    })
+    if (userExist) {
+      await db
+        .collection("posts")
+        .doc(postId)
+        .update({
+          likes: [...likes, userId]
+        });
+    }
+    // console.log();
+  }
+  
   const avatarAdd = async () => {
     // No permissions request is necessary for launching the image library
     const imageFromGallery = await ImagePicker.launchImageLibraryAsync({
@@ -115,20 +133,34 @@ export function ProfileScreen({ navigation }) {
                 {/* Описание */}
                 <Text style={styles.description}>{item.description}</Text>
 
-                {/* Кнопка Комментарии */}
                 <View style={styles.buttonsContainer}>
 
+                  {/* Кнопка Комментарии */}
                   <TouchableOpacity
                     style={styles.commentsBtn}
                     onPress={() =>
                       navigation.navigate('Comments', {
-                        postId: item.id,
+                        postId: item.postId,
                         postImage: item.photo,
-                        comments: item.comments ? item.comments : []
+                        postComments: item.comments
                       })}
                   >
-                    <Feather name='message-circle' size={24} color={'#BDBDBD'} style={{ marginRight: 6 }} />
+                    <Feather name='message-circle' size={24} style={{
+                      marginRight: 6,
+                      color: (item.comments<1) ? '#BDBDBD' : '#FF6C00'
+                    }} />
                     <Text style={styles.numberComments}>{item.comments.length}</Text>
+                  </TouchableOpacity>
+
+                  {/* Кнопка Лайки */}
+                  <TouchableOpacity
+                    onPress={() => like(item.postId, item.likes)}
+                  >
+                    <Feather name="thumbs-up" size={24} style={{
+                        marginRight: 6,
+                        color: (item.comments<1) ? '#BDBDBD' : '#FF6C00'
+                    }} />
+                    <Text style={styles.numberComments}>{item.likes.length}</Text>
                   </TouchableOpacity>
 
                   {/* Кнопка Геолокация */}

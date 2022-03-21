@@ -1,6 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, TouchableWithoutFeedback, KeyboardAvoidingView, Platform, Keyboard, Image, ImageBackground } from 'react-native';
-
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  KeyboardAvoidingView,
+  Platform,
+  Keyboard,
+  Image,
+  ImageBackground,
+} from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 import { useDispatch } from 'react-redux';
@@ -17,13 +28,12 @@ const initialState = {
 }
 
 export function RegisterScreen({ navigation }) {
-  console.log('******RegisterScreen*******');
+  console.log('****** RegisterScreen *******');
   const dispatch = useDispatch()
 
   const [state, setState] = useState(initialState)
 
   const [showKeyboard, setShowKeyboard] = useState(false);
-  
   const [focusNameInput, setFocusNameInput] = useState(false);
   const [focusEmailInput, setFocusEmailInput] = useState(false);
   const [focusPasswordInput, setFocusPasswordInput] = useState(false);

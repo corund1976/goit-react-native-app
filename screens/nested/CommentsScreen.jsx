@@ -6,17 +6,20 @@ import { useSelector } from 'react-redux';
 import { db } from "../../firebase/config";
 
 export function CommentsScreen({ route }) {
-  const { postId, postImage, comments } = route.params;
-  const { userName, userAvatar } = useSelector(state => state.auth);
+  console.log('****** CommentsScreen *******');
+
+  const { postId, postImage, postComments } = route.params;
+  const { userAvatar, userEmail, userName } = useSelector(state => state.auth);
 
   const [newComment, setNewComment] = useState('');
-  const [allComments, setAllComments] = useState(comments);
+  const [allComments, setAllComments] = useState(postComments);
 
   const [showKeyboard, setShowKeyboard] = useState(false);
-
-  // useEffect(() => {
-  //   getAllComments()
-  // }, []);
+  const [focusCommentInput, setFocusCommentInput] = useState(false);
+  
+  useEffect(() => {
+    getAllComments()
+  }, [newComment]);
 
   const createComment = async () => {
     if (newComment) {
@@ -24,36 +27,40 @@ export function CommentsScreen({ route }) {
       .collection("posts")
       .doc(postId)
       .update({
-        comments: [...allComments, { comment: newComment, userAvatar, userName }],
+        comments: [...allComments, { comment: newComment, userAvatar, userEmail, userName }]
       });
     };    
     setNewComment('');
 
+    // const data = await db
+    //   .collection("posts")
+    //   .doc(postId)
+    //   .get();
+    // setAllComments(data.data().comments);
+    // console.log(data.data().comments);
+
+  }
+
+  const getAllComments = async () => {
     const data = await db
       .collection("posts")
       .doc(postId)
       .get();
     setAllComments(data.data().comments);
-    console.log(data.data().comments);
-
   }
 
-  // const getAllComments = async () => {
-  //   await db
-  //     .collection("posts")
-  //     .doc(postId)
-  //     .onSnapshot(data => {
-  //       console.log('#38 =======> ', data.data());
-  //       console.log('#39 =======> ', data.data().comments);
-  //       setAllComments(data.data().comments);
-  //     })
-  // }
-
-
-  const newCommentInputHandler = (text) => {
+  const commentInputHandler = (text) => {
     setNewComment(text);
   };
 
+  const onFocusCommentInput = () => {
+    setShowKeyboard(true);
+    setFocusCommentInput(true);
+  }
+  const onBlurCommentInput = () => {
+    setShowKeyboard(false);
+    setFocusCommentInput(false);
+  }
   const hideKeyboard = () => {
     setShowKeyboard(false);
     Keyboard.dismiss();
@@ -76,24 +83,27 @@ export function CommentsScreen({ route }) {
             data={allComments}
             keyExtractor={(item, index) => index.toString()}
             renderItem={({ item }) => (
+              // Контейнер комментария
               <View style={{
                 marginBottom: 24,
-                flexDirection: item.userName !== userName ? "row" : "row-reverse"
+                flexDirection: item.userEmail !== userEmail ? "row" : "row-reverse"
               }}>
+                {/* Аватарка комментария */}
                 <Image
                   style={{
                     borderRadius: 50,
                     width: 28,
                     height: 28,
-                    marginRight: item.userName !== userName ? 16 : 0,
-                    marginLeft: item.userName !== userName ? 0 : 16,
+                    marginRight: item.userEmail !== userEmail ? 16 : 0,
+                    marginLeft: item.userEmail !== userEmail ? 0 : 16,
                   }}
                   source={{ uri: item.userAvatar }}
                 />
+                {/* Текст комментария */}
                 <Text
                   style={{
-                    borderTopLeftRadius: item.userName !== userName ? 0 : 6,
-                    borderTopRightRadius: item.userName !== userName ? 6 : 0,
+                    borderTopLeftRadius: item.userEmail !== userEmail ? 0 : 6,
+                    borderTopRightRadius: item.userEmail !== userEmail ? 6 : 0,
                     borderBottomLeftRadius: 6,
                     borderBottomRightRadius: 6,
                     backgroundColor: "#00000008",
@@ -109,12 +119,14 @@ export function CommentsScreen({ route }) {
           {/* Форма ввода комментария */}
           <View style={styles.form}>
 
-            {/* Поле Комментарий */}
+            {/* Comment */}
             <TextInput
               placeholder='Комментировать...'
               placeholderTextColor='#BDBDBD'
               value={newComment}
-              onChangeText={newCommentInputHandler}
+              onChangeText={commentInputHandler}
+              onFocus={onFocusCommentInput}
+              onBlur={onBlurCommentInput}
               style={styles.input}
             />
 

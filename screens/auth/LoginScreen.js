@@ -9,9 +9,10 @@ import {
   KeyboardAvoidingView,
   Platform,
   Keyboard,
-  ImageBackground
+  ImageBackground,
 } from 'react-native';
 import { useDispatch } from "react-redux";
+
 import { authSignInUser } from "../../redux/auth/authOperations";
 
 const initialState = {
@@ -43,7 +44,6 @@ export function LoginScreen({ navigation }) {
   const handleSubmit = () => {
     setShowKeyboard(false);
     Keyboard.dismiss();
-    console.log('state ------->', state);
     dispatch(authSignInUser(state));
     setState(initialState);
   }
@@ -72,61 +72,68 @@ export function LoginScreen({ navigation }) {
       style={styles.container}
     >
       <TouchableWithoutFeedback onPress={hideKeyboard}>
+
         <ImageBackground
           source={require('../../assets/images/PhotoBG.png')}
           style={styles.bgImage}
         >
-        <View style={styles.form}>
-          <Text style={styles.formTitle}>
+
+          <View style={styles.form}>
+
+            <Text style={styles.formTitle}>
             Войти
-          </Text>
-          <TextInput
-            placeholder="Адрес электронной почты"
-            placeholderTextColor='#BDBDBD'
-            value={state.email}
-            onChangeText={emailInputHandler}
-            onFocus={onFocusEmailInput}
-            onBlur={onBlurEmailInput}
-            style={{
-              ...styles.input,
-              borderColor: focusEmailInput ? '#FF6C00' : '#E8E8E8',
-              backgroundColor: focusEmailInput ? '#FFFFFF' : '#F6F6F6',
-            }}
-            underlineColorAndroid="transparent"
-          />
-          <TextInput
-            placeholder="Пароль"
-            placeholderTextColor='#BDBDBD'
-            secureTextEntry={true}
-            value={state.password}
-            onChangeText={passwordInputHandler}
-            onFocus={onFocusPasswordInput}
-            onBlur={onBlurPasswordInput}
-            style={{
-              ...styles.input,
-              borderColor: focusPasswordInput ? '#FF6C00' : '#E8E8E8',
-              backgroundColor: focusPasswordInput ? '#FFFFFF' : '#F6F6F6',
-            }}
-            underlineColorAndroid="transparent"
-          />
-          <TouchableOpacity
-            style={styles.button}
-            activeOpacity={0.8}
-            onPress={handleSubmit}
+            </Text>
+              
+            <TextInput
+              placeholder="Адрес электронной почты"
+              placeholderTextColor='#BDBDBD'
+              value={state.email}
+              onChangeText={emailInputHandler}
+              onFocus={onFocusEmailInput}
+              onBlur={onBlurEmailInput}
+              style={{
+                ...styles.input,
+                borderColor: focusEmailInput ? '#FF6C00' : '#E8E8E8',
+                backgroundColor: focusEmailInput ? '#FFFFFF' : '#F6F6F6',
+              }}
+            />
+                          
+            <TextInput
+              placeholder="Пароль"
+              placeholderTextColor='#BDBDBD'
+              secureTextEntry={true}
+              value={state.password}
+              onChangeText={passwordInputHandler}
+              onFocus={onFocusPasswordInput}
+              onBlur={onBlurPasswordInput}
+              style={{
+                ...styles.input,
+                borderColor: focusPasswordInput ? '#FF6C00' : '#E8E8E8',
+                backgroundColor: focusPasswordInput ? '#FFFFFF' : '#F6F6F6',
+              }}
+            />
+
+            <TouchableOpacity
+              style={styles.button}
+              activeOpacity={0.8}
+              onPress={handleSubmit}
+              >
+              <Text style={styles.buttonTitle}>
+                Войти
+              </Text>
+            </TouchableOpacity>
+              
+              
+            <TouchableOpacity
+              style={{ marginBottom: showKeyboard ? -97 : 144 }} /* 207-78=129-32=97 */
+              activeOpacity={0.7}
+              onPress={() => navigation.navigate('Register')}
             >
-            <Text style={styles.buttonTitle}>
-              Войти
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={{ marginBottom: showKeyboard ? -97 : 144 }} /* 207-78=129-32=97 */
-            activeOpacity={0.7}
-            onPress={() => navigation.navigate('Register')}
-          >
-            <Text style={styles.link}> 
-              Нет аккаунта? Зарегистрироваться
-            </Text>
-          </TouchableOpacity>
+              <Text style={styles.link}> 
+                Нет аккаунта? Зарегистрироваться
+              </Text>
+            </TouchableOpacity>
+            
           </View>
         </ImageBackground>
       </TouchableWithoutFeedback>
