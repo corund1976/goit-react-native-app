@@ -104,6 +104,7 @@ export function ProfileScreen({ navigation }) {
 
           <FlatList
             data={userPosts}
+            // numColumns={2}
             keyExtractor={(item, index) => index.toString()}
             renderItem={({ item }) => (
               <View style={styles.listItem}>
@@ -122,11 +123,12 @@ export function ProfileScreen({ navigation }) {
                     onPress={() =>
                       navigation.navigate('Comments', {
                         postId: item.id,
-                        postImage: item.photo
+                        postImage: item.photo,
+                        comments: item.comments ? item.comments : []
                       })}
                   >
                     <Feather name='message-circle' size={24} color={'#BDBDBD'} style={{ marginRight: 6 }} />
-                    <Text style={styles.numberComments}>123456</Text>
+                    <Text style={styles.numberComments}>{item.comments.length}</Text>
                   </TouchableOpacity>
 
                   {/* Кнопка Геолокация */}
@@ -174,7 +176,7 @@ const styles = StyleSheet.create({
   },
   profile: {
     flex: 1,
-    alignItems: 'center',
+    // alignItems: 'center',
 
     backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 25,
@@ -190,6 +192,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12.5,
     position: 'absolute',
     top: -60,
+    left: '42.5%',
   },
   avatar: {
     borderRadius: 16,

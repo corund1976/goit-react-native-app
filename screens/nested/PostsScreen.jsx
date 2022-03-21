@@ -11,24 +11,13 @@ export function PostsScreen ({ navigation }) {
 
   const [posts, setPosts] = useState([])
   
-
   const getAllPosts = () => {
     db.collection('posts')
       .onSnapshot(data => {
-        setPosts(data.docs.map(doc => ({ ...doc.data(), postId: doc.id })))
+        setPosts(data.docs.map(doc => ({ ...doc.data(), postId: doc.id, })))
       })
-  }
-  
-  const numComments = (id) => {
-    let numComments = 0;
-    db.collection(`posts/${id}/comments`)
-        .onSnapshot(data => {
-          numComments = Object.keys(data.docs).length;
-          console.log(Object.keys(data.docs).length);
-        })
-    return numComments;
-  }
-  
+    }
+    
   useEffect(() => {
     getAllPosts();
   }, []);
@@ -51,6 +40,7 @@ export function PostsScreen ({ navigation }) {
           </Text>
         </View>
       </View>
+
       <FlatList
         data={posts}
         keyExtractor={(item, index) => index.toString()}
@@ -68,10 +58,15 @@ export function PostsScreen ({ navigation }) {
 
               <TouchableOpacity
                 style={styles.commentsBtn}
-                onPress={() => navigation.navigate('Comments', { postId: item.postId, postImage: item.photo })}
+                onPress={() =>
+                  navigation.navigate('Comments', {
+                    postId: item.postId,
+                    postImage: item.photo,
+                    comments: item.comments ? item.comments : []
+                })}
               >
                 <Feather name='message-circle' size={24} color={'#BDBDBD'} style={{ marginRight: 6 }} />
-                <Text style={styles.numberComments}>{numComments(item.postId)}</Text>
+                <Text style={styles.numberComments}>{item.comments.length}</Text>
               </TouchableOpacity>
 
               {/* Кнопка Геолокация */}
@@ -109,6 +104,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     // alignItems: 'center',
     paddingHorizontal: 16,
+    maxWidth: 375,
     backgroundColor: '#ffffff'
   },
   user: {

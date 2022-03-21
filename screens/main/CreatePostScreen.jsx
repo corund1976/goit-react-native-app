@@ -133,18 +133,17 @@ export const CreatePostScreen = ({ navigation }) => {
       latitude,
       longitude,
       userId,
-      userName
+      userName,
+      comments: []
     }
 
     console.log('!!!! created newPost:', newPost);
 
-    const createPost = await db.collection("posts").add(newPost);    
+    await db.collection("posts").add(newPost);    
     
     setIsLoading(false);
 
-    console.log('!!!! post uploaded to Firebase :', createPost);
-
-    return createPost;
+    console.log('!!!! post uploaded to Firebase :');
   };
   
   const deletePost = () => {

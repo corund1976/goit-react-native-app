@@ -6,45 +6,52 @@ import { useSelector } from 'react-redux';
 import { db } from "../../firebase/config";
 
 export function CommentsScreen({ route }) {
-  const { postId, postImage } = route.params;
+  const { postId, postImage, comments } = route.params;
   const { userName, userAvatar } = useSelector(state => state.auth);
 
-
-  console.log('postId', postId);
-  console.log("postImage", postImage);
-  console.log("userName", userName);
-  console.log("userAvatar", userAvatar);
-
-  const [comment, setComment] = useState('');
-  const [allComments, setAllComments] = useState([]);
+  const [newComment, setNewComment] = useState('');
+  const [allComments, setAllComments] = useState(comments);
 
   const [showKeyboard, setShowKeyboard] = useState(false);
 
-  useEffect(() => {
-    getAllComments()
-  }, []);
+  // useEffect(() => {
+  //   getAllComments()
+  // }, []);
 
   const createComment = async () => {
-    await db
+    if (newComment) {
+      await db
       .collection("posts")
       .doc(postId)
-      .collection("comments")
-      .add({ comment, userName, userAvatar })
-    
-    setComment('')
-  }
+      .update({
+        comments: [...allComments, { comment: newComment, userAvatar, userName }],
+      });
+    };    
+    setNewComment('');
 
-  const getAllComments = async () => {
-    await db
+    const data = await db
       .collection("posts")
       .doc(postId)
-      .collection("comments")
-      .onSnapshot(data =>
-        setAllComments(data.docs.map(doc => ({ ...doc.data(), id: doc.id }))))
+      .get();
+    setAllComments(data.data().comments);
+    console.log(data.data().comments);
+
   }
 
-  const commentInputHandler = (text) => {
-    setComment(text);
+  // const getAllComments = async () => {
+  //   await db
+  //     .collection("posts")
+  //     .doc(postId)
+  //     .onSnapshot(data => {
+  //       console.log('#38 =======> ', data.data());
+  //       console.log('#39 =======> ', data.data().comments);
+  //       setAllComments(data.data().comments);
+  //     })
+  // }
+
+
+  const newCommentInputHandler = (text) => {
+    setNewComment(text);
   };
 
   const hideKeyboard = () => {
@@ -67,7 +74,7 @@ export function CommentsScreen({ route }) {
           <FlatList
             style={styles.list}
             data={allComments}
-            keyExtractor={item => item.id}
+            keyExtractor={(item, index) => index.toString()}
             renderItem={({ item }) => (
               <View style={{
                 marginBottom: 24,
@@ -106,8 +113,8 @@ export function CommentsScreen({ route }) {
             <TextInput
               placeholder='Комментировать...'
               placeholderTextColor='#BDBDBD'
-              value={comment}
-              onChangeText={commentInputHandler}
+              value={newComment}
+              onChangeText={newCommentInputHandler}
               style={styles.input}
             />
 
@@ -148,6 +155,7 @@ const styles = StyleSheet.create({
   list: {
     marginHorizontal: 16,
     marginBottom: 31,
+    // maxHeight: 323,
   },
   // commentContainer: {
   //   flexDirection: 'row',
