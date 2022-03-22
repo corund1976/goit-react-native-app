@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -9,19 +9,14 @@ import {
   KeyboardAvoidingView,
   Platform,
   Keyboard,
-  Image,
   ImageBackground,
 } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
-import { Ionicons } from '@expo/vector-icons';
 import { useDispatch } from 'react-redux';
 
 import { authSignUpUser } from '../../redux/auth/authOperations';
-
-const defaultAvatar = '../../assets/images/default-avatar.png';
+import AvatarContainer from '../../components/AvatarContainer';
 
 const initialState = {
-  avatar: null,
   name: '',
   email: '',
   password: '',
@@ -29,6 +24,7 @@ const initialState = {
 
 export function RegisterScreen({ navigation }) {
   console.log('****** RegisterScreen *******');
+  
   const dispatch = useDispatch()
 
   const [state, setState] = useState(initialState)
@@ -37,24 +33,6 @@ export function RegisterScreen({ navigation }) {
   const [focusNameInput, setFocusNameInput] = useState(false);
   const [focusEmailInput, setFocusEmailInput] = useState(false);
   const [focusPasswordInput, setFocusPasswordInput] = useState(false);
-
-  const avatarAdd = async () => {
-    // No permissions request is necessary for launching the image library
-    let avatarFromGallery = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-    
-    if (!avatarFromGallery.cancelled) {
-      setState(prevState => ({ ...prevState, avatar: avatarFromGallery.uri }));
-    }
-  };
-    
-  const avatarDelete = () => {
-    setState(prevState => ({ ...prevState, avatar: null }))
-  };
 
   const nameInputHandler = (text) => {
     setState(prevState => ({ ...prevState, name: text }))
@@ -117,28 +95,8 @@ export function RegisterScreen({ navigation }) {
 
           <View style={styles.form}>
               
-            {/* Аватарка */}
-            <View style={styles.avatarContainer}>
-              <Image
-                style={styles.avatar}
-                source={state.avatar ? { uri: state.avatar } : require(defaultAvatar) }
-              />
-
-              {/* Кнопка Добавить/Удалить аватар */}
-                <TouchableOpacity
-                  style={styles.avatarButton}
-                  activeOpacity={0.8}
-                  onPress={!state.avatar ? avatarAdd : avatarDelete}
-                >
-                  <Ionicons name="add-circle-outline"
-                    size={25}
-                    color={'#FF6C00'}
-                    style={state.avatar && styles.avatarRemoveIcon}
-                  />
-                </TouchableOpacity>
-
-            </View>
-
+            <AvatarContainer />
+                        
             {/* Название формы */}
             <Text style={styles.formTitle}>
               Регистрация
@@ -238,37 +196,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
 
     // position: 'relative'
-  },
-  avatarContainer: {
-    paddingHorizontal: 12.5,
-    position: 'absolute',
-    top: -60,
-  },
-  avatar: {
-    borderRadius: 16,
-    backgroundColor: '#F6F6F6',
-
-    width: 120,
-    height: 120,
-
-    // alignSelf: 'center',
-  },
-  avatarButton: {
-    width: 25,
-    height: 25,
-    // alignItems: 'center',
-    // justifyContent: 'center',
-    
-    position: 'absolute',
-    bottom: 14,
-    right: 0
-  },
-  avatarRemoveIcon: {
-    borderRadius: 50,
-    backgroundColor: '#FFFFFF',
-    color: '#BDBDBD',
-
-    transform: [{ rotate: '45deg' }],
   },
   formTitle: {
     fontFamily: 'Roboto-Medium',

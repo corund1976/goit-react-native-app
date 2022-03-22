@@ -5,6 +5,7 @@ import * as Location from 'expo-location';
 import * as ImagePicker from 'expo-image-picker';
 import { Feather, MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { useSelector } from 'react-redux';
+
 import { storage, db } from '../../firebase/config';
 // import { collection } from "firebase/firestore";
 // import { ref } from "firebase/storage";
@@ -14,8 +15,6 @@ const initialState = {
   photo: null,
   description: '',
   locality: '',
-  // latitude: null,
-  // longitude: null,
 }
 
 export const CreatePostScreen = ({ navigation }) => {
@@ -95,13 +94,14 @@ export const CreatePostScreen = ({ navigation }) => {
     await uploadPostToServer();
 
     if (!isLoading) {
+      console.log('Redirecting to Posts !!!');
       navigation.navigate('Posts');
       setState(initialState);
     }
   }
 
   const uploadPhotoToServer = async () => {
-    console.log('!!!! start uploading photo to Storage !!!!');
+    console.log('!!!! start uploading Photo to Storage !!!!');
 
     const response = await fetch(state.photo);
     const file = await response.blob();
@@ -110,7 +110,9 @@ export const CreatePostScreen = ({ navigation }) => {
     await storage.ref(`images/${id}`).put(file);
 
     const processedPhotoURL = await storage.ref('images').child(`${id}`).getDownloadURL();
+
     console.log('!!!! photo uploaded to Storage successfully !!!!');
+
     return processedPhotoURL;
   }
 
@@ -138,13 +140,11 @@ export const CreatePostScreen = ({ navigation }) => {
       likes: []
     }
 
-    console.log('!!!! created newPost:', newPost);
-
+    console.log('!!!! created new Post:');
     await db.collection("posts").add(newPost);    
     
     setIsLoading(false);
-
-    console.log('!!!! post uploaded to Firebase :');
+    console.log('!!!! post uploaded to Firebase');
   };
   
   const deletePost = () => {

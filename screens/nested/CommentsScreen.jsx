@@ -19,7 +19,8 @@ export function CommentsScreen({ route }) {
   
   useEffect(() => {
     getAllComments()
-  }, [newComment]);
+    console.log('useEffect "getAllComments"  @CommentsScreen@ ');
+  }, []);
 
   const createComment = async () => {
     if (newComment) {
@@ -29,16 +30,10 @@ export function CommentsScreen({ route }) {
       .update({
         comments: [...allComments, { comment: newComment, userAvatar, userEmail, userName }]
       });
-    };    
+    };   
+    
     setNewComment('');
-
-    // const data = await db
-    //   .collection("posts")
-    //   .doc(postId)
-    //   .get();
-    // setAllComments(data.data().comments);
-    // console.log(data.data().comments);
-
+    getAllComments();
   }
 
   const getAllComments = async () => {
@@ -46,6 +41,7 @@ export function CommentsScreen({ route }) {
       .collection("posts")
       .doc(postId)
       .get();
+    
     setAllComments(data.data().comments);
   }
 

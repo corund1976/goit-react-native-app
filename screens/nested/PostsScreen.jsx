@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 import { useSelector } from 'react-redux';
-import { Feather } from '@expo/vector-icons';
 
 import { db } from '../../firebase/config';
+import PostsList from '../../components/PostsList';
 
-export function PostsScreen ({ navigation }) {
+export function PostsScreen () {
   console.log('****** PostsScreen *******');
 
   const [posts, setPosts] = useState([])
@@ -19,6 +19,7 @@ export function PostsScreen ({ navigation }) {
       
   useEffect(() => {
     getAllPosts();
+    console.log('useEffect "getAllPosts"  @postScreen@ ');
   }, []);
 
   const { userAvatar, userName, userEmail } = useSelector(state => state.auth);
@@ -49,64 +50,8 @@ export function PostsScreen ({ navigation }) {
         </View>
       </View>
 
-      {/* Список всех постов приложения */}
-      <FlatList
-        data={posts}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.listItem}>
+      <PostsList posts={posts} />
 
-            {/* Фото пост */}
-            <Image source={{ uri: item.photo }} style={styles.image} />
-                        
-            {/* Описание */}
-            <Text style={styles.description}>{item.description}</Text>
-
-            {/* Кнопка Комментарии */}
-            <View style={styles.buttonsContainer}>
-
-              <TouchableOpacity
-                style={styles.commentsBtn}
-                onPress={() =>
-                  navigation.navigate('Comments', {
-                    postId: item.postId,
-                    postImage: item.photo,
-                    postComments: item.comments,
-                })}
-              >
-                <Feather name='message-circle' size={24} style={{
-                  marginRight: 6,
-                  color: (item.comments<1) ? '#BDBDBD' : '#FF6C00'
-                }} />
-      
-                <Text style={styles.numberComments}>{item.comments.length}</Text>
-              </TouchableOpacity>
-
-              {/* Кнопка Геолокация */}
-              <TouchableOpacity
-                style={styles.locationBtn}
-                onPress={() => navigation.navigate('Map', {
-                  location:
-                  {
-                    locality: item.locality,
-                    latitude: item.latitude,
-                    longitude: item.longitude
-                  }
-                })}
-              >
-                <Feather name='map-pin' size={24} color={'#BDBDBD'} style={{ marginRight: 4 }} />
-                {item.locality
-                  ?
-                    <Text style={styles.locationLink}>{item.locality}</Text>
-                  :
-                    <Text style={styles.locationLink}>{item.latitude.toFixed(4)}  {item.longitude.toFixed(4)}</Text>
-                }
-              </TouchableOpacity>
-
-            </View>
-          </View>
-        )}
-      />
     </View>
   )
 };
@@ -117,7 +62,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     // alignItems: 'center',
     paddingHorizontal: 16,
-    maxWidth: 375,
+    // maxWidth: 375,
     backgroundColor: '#ffffff'
   },
   user: {
@@ -149,58 +94,6 @@ const styles = StyleSheet.create({
 
     color: '#21212180'
   },
-  listItem: {
-    // alignItems: 'center',
-    justifyContent: 'center',
-    
-    marginBottom: 32,
-  },
-  image: {
-    borderRadius: 8,
-
-    width: '100%',
-    height: 240,
-
-    marginBottom: 8,
-  },
-  description: {
-    alignSelf: 'flex-start',
-
-  },
-
-  buttonsContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: "space-between"
-  },
-
-  commentsBtn: {
-    marginRight: 10,
-    maxWidth: '20%',
-
-    flexDirection: 'row',
-  },
-  numberComments: {
-    fontWeight: '400',
-    fontSize: 16,
-    lineHeight: 19,
-
-    color: '#BDBDBD',
-  },
-
-  locationBtn: {
-    maxWidth: '80%',
-
-    flexDirection: 'row',
-  },
-  locationLink: {
-    fontWeight: '400',
-    fontSize: 16,
-    lineHeight: 19,
-    textDecorationLine: 'underline',
-
-    color: '#212121',
-  }
 
 });
 
