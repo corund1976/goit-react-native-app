@@ -2,24 +2,26 @@ import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 
-import useRoute from '../router';
+import { AuthStackNavigator } from './authStackNavigator';
+import { MainTabNavigator } from './mainTabNavigator';
 import { changeAuthStatusUser } from '../redux/auth/authOperations';
 
-function Main() {
+export function Router() {
   const dispatch = useDispatch();
+  const isAuthorised = useSelector(state => state.auth.authStatus); 
   
   useEffect(() => {
     dispatch(changeAuthStatusUser());
   }, []);
   
-  const isAuthorised = useSelector(state => state.auth.authStatus); 
-  const router = useRoute(isAuthorised);
-
   return (
     <NavigationContainer>
-      {router}
+      {!isAuthorised
+        ?
+        <AuthStackNavigator />
+        :
+        <MainTabNavigator />
+      }
     </NavigationContainer>
   )
 };
-
-export default Main;

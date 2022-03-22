@@ -8,7 +8,7 @@ import GoBackButton from '../components/GoBackButton';
 
 const MainTab = createBottomTabNavigator();
 
-export const MainTabNavigator = () => {
+export function MainTabNavigator() {
   return (
     <MainTab.Navigator
       initialRouteName={HomeScreen}
@@ -83,5 +83,4 @@ export const MainTabNavigator = () => {
       />
     </MainTab.Navigator>
   )
-
-}
+};

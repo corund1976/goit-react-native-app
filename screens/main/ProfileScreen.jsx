@@ -6,8 +6,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { db } from '../../firebase/config';
 import { authSignOutUser } from '../../redux/auth/authOperations';
 
-import PostsList from '../../components/PostsList';
-import AvatarContainer from '../../components/AvatarContainer';
+import { PostsList } from '../../components';
+import { AvatarContainer } from '../../components';
 
 const BG = '../../assets/images/PhotoBG.png';
 

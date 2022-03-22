@@ -5,8 +5,8 @@ import AppLoading from 'expo-app-loading';
 import { useFonts } from 'expo-font'
 import { Provider } from 'react-redux';
 
-import Main from './components/Main';
 import { store } from './redux/store';
+import { Router } from './routes';
 
 function App() {
   let [fontsLoaded] = useFonts({
@@ -23,7 +23,7 @@ function App() {
   return (
     <Provider store={store}>
       <View style={styles.container}>
-        <Main />
+        <Router />
       </View>
     </Provider>
   )

@@ -14,7 +14,7 @@ import {
 import { useDispatch } from 'react-redux';
 
 import { authSignUpUser } from '../../redux/auth/authOperations';
-import AvatarContainer from '../../components/AvatarContainer';
+import { AvatarContainer } from '../../components';
 
 const initialState = {
   name: '',

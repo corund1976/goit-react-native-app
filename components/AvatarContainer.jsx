@@ -9,7 +9,7 @@ import { storage } from '../firebase/config';
 
 const defaultAvatar = '../assets/images/default-avatar.png';
 
-function AvatarContainer() {
+export function AvatarContainer() {
   const dispatch = useDispatch()
   const { userAvatar } = useSelector(state => state.auth);
   
@@ -107,5 +107,3 @@ const styles = StyleSheet.create({
     transform: [{ rotate: '45deg' }],
   },
 });
-
-export default AvatarContainer;

@@ -6,11 +6,11 @@ import { useSelector } from 'react-redux';
 
 import { db } from '../firebase/config';
 
-function PostsList({ posts }) {
+export function PostsList({ posts }) {
   const navigation = useNavigation();
   const { userId } = useSelector(state => state.auth);
 
-  const like = async (postId, likeUserIdsArray) => {
+  const setLike = async (postId, likeUserIdsArray) => {
     const userExist = likeUserIdsArray.find(user => user === userId)
 
     if (!userExist) {
@@ -41,7 +41,7 @@ function PostsList({ posts }) {
 
             {/* Кнопка Комментарии */}
             <TouchableOpacity
-              style={styles.commentsBtn}
+              style={styles.commentsAndLikesBtn}
               onPress={() =>
                 navigation.navigate('Comments', {
                   postId: item.postId,
@@ -58,11 +58,12 @@ function PostsList({ posts }) {
 
             {/* Кнопка Лайки */}
             <TouchableOpacity
-              onPress={() => like(item.postId, item.likes)}
+              style={styles.commentsAndLikesBtn}
+              onPress={() => setLike(item.postId, item.likes)}
             >
               <Feather name="thumbs-up" size={24} style={{
                   marginRight: 6,
-                  color: (item.comments<1) ? '#BDBDBD' : '#FF6C00'
+                  color: (item.likes<1) ? '#BDBDBD' : '#FF6C00'
               }} />
               <Text style={styles.numberComments}>{item.likes.length}</Text>
             </TouchableOpacity>
@@ -121,7 +122,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between"
   },
 
-  commentsBtn: {
+  commentsAndLikesBtn: {
     marginRight: 10,
     maxWidth: '20%',
 
@@ -149,5 +150,3 @@ const styles = StyleSheet.create({
     color: '#212121',
   }
 });
-
-export default PostsList;

@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Image } from 'react-native';
 import { useSelector } from 'react-redux';
 
 import { db } from '../../firebase/config';
-import PostsList from '../../components/PostsList';
+import { PostsList } from '../../components';
 
 export function PostsScreen () {
   console.log('****** PostsScreen *******');
