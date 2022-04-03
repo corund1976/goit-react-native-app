@@ -72,18 +72,17 @@ export function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'flex-end'
+    // justifyContent: 'flex-end'
   },
   bgImage: {
     flex: 1,
     resizeMode: 'cover',
-    justifyContent: 'flex-end',
-    
-    
+    // justifyContent: 'flex-end',
   },
   profile: {
     flex: 1,
-    // alignItems: 'center',
+    alignItems: 'center',
+    // выставляем карточки по центру в столбце
 
     backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 25,

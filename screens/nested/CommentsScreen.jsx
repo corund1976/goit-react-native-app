@@ -28,7 +28,7 @@ export function CommentsScreen({ route }) {
       .collection("posts")
       .doc(postId)
       .update({
-        comments: [...allComments, { comment: newComment, userAvatar, userEmail, userName }]
+        comments: [...allComments, { comment: newComment, userAvatar, userEmail, userName, commentDate: Date.now() }]
       });
     };   
     
@@ -60,6 +60,21 @@ export function CommentsScreen({ route }) {
   const hideKeyboard = () => {
     setShowKeyboard(false);
     Keyboard.dismiss();
+  }
+
+  const timestampToDate = (timestamp) => {
+    const formattedDate = new Date(timestamp).toLocaleString("ru", {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      // weekday: 'long',
+      timezone: 'UTC',
+      hour: 'numeric',
+      minute: 'numeric',
+      // second: 'numeric'
+    });
+    
+    return (formattedDate);
   }
 
   return (
@@ -96,7 +111,7 @@ export function CommentsScreen({ route }) {
                   source={{ uri: item.userAvatar }}
                 />
                 {/* Текст комментария */}
-                <Text
+                <View
                   style={{
                     borderTopLeftRadius: item.userEmail !== userEmail ? 0 : 6,
                     borderTopRightRadius: item.userEmail !== userEmail ? 6 : 0,
@@ -106,8 +121,10 @@ export function CommentsScreen({ route }) {
                     padding: 16,
                   }}
                 >
-                  {item.comment}
-                </Text>
+                  <Text>{item.comment}</Text>
+                  <Text>{timestampToDate(item.commentDate)}</Text>
+                </View>
+                
               </View>
             )}  
           />

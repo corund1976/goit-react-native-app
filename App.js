@@ -13,7 +13,7 @@ function App() {
     'Roboto-Regular': require('./assets/fonts/Roboto-Regular.ttf'),
     'Roboto-Medium': require('./assets/fonts/Roboto-Medium.ttf'),
   });
-  
+
   if (!fontsLoaded) {
     return (
       <AppLoading />

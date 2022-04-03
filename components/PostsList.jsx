@@ -98,6 +98,8 @@ export function PostsList({ posts }) {
 
 const styles = StyleSheet.create({
   listItem: {
+    width: 375,
+
     // alignItems: 'center',
     justifyContent: 'center',
     
