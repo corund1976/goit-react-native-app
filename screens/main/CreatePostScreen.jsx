@@ -42,16 +42,16 @@ export const CreatePostScreen = ({ navigation }) => {
     });
   }, []);
 
-  if (hasPermissionCamera === null) {
-    return <View />;
-  }
+  // if (hasPermissionCamera === null) {
+  //   return <View />;
+  // }
   if (hasPermissionCamera === false) {
     return <Text>No access to camera</Text>;
   }
   
-  if (hasPermissionLocation === null) {
-    return <View />;
-  }
+  // if (hasPermissionLocation === null) {
+  //   return <View />;
+  // }
   if (hasPermissionLocation === false) {
     return <Text>No access to location</Text>;
   }
