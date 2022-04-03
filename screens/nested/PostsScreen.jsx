@@ -60,9 +60,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    // alignItems: 'center',
+    alignItems: 'center',
+    // выставляем карточки по центру в столбце
     paddingHorizontal: 16,
-    // maxWidth: 375,
     backgroundColor: '#ffffff'
   },
   user: {
