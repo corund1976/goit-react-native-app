@@ -45,7 +45,9 @@ export function ProfileScreen() {
 
         <View style={styles.profile}>
 
-          <AvatarContainer />
+          <View style={styles.avatar}> 
+            <AvatarContainer />
+          </View>
                     
           {/* Кнопка Логаут */}
           <TouchableOpacity
@@ -81,7 +83,7 @@ const styles = StyleSheet.create({
   },
   profile: {
     flex: 1,
-    alignItems: 'center',
+    // alignItems: 'center',
     // выставляем карточки по центру в столбце
 
     backgroundColor: '#FFFFFF',
@@ -92,7 +94,12 @@ const styles = StyleSheet.create({
     paddingTop: 92,
     paddingHorizontal: 16,
 
-    // position: 'relative'
+    position: 'relative'
+  },
+  avatar: {
+    position: 'absolute',
+    top: -60,
+    left: 128,
   },
   logoutButton: {
     position: 'absolute',

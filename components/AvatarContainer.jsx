@@ -76,9 +76,6 @@ export function AvatarContainer() {
 const styles = StyleSheet.create({
   avatarContainer: {
     paddingHorizontal: 12.5,
-    position: 'absolute',
-    top: -60,
-    left: '42.5%',
   },
   avatar: {
     borderRadius: 16,
@@ -86,14 +83,10 @@ const styles = StyleSheet.create({
 
     width: 120,
     height: 120,
-
-    // alignSelf: 'center',
   },
   avatarButton: {
     width: 25,
     height: 25,
-    // alignItems: 'center',
-    // justifyContent: 'center',
     
     position: 'absolute',
     bottom: 14,

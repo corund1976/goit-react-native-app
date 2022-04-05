@@ -5,6 +5,8 @@ import { useSelector } from 'react-redux';
 import { db } from '../../firebase/config';
 import { PostsList } from '../../components';
 
+const defaultAvatar = '../../assets/images/default-avatar.png';
+
 export function PostsScreen () {
   console.log('****** PostsScreen *******');
 
@@ -32,7 +34,7 @@ export function PostsScreen () {
 
         {/* Аватар */}
         <Image
-          source={{ uri: userAvatar }}
+          source={userAvatar ? { uri: userAvatar } : require(defaultAvatar) }
           style={styles.avatar}
         />
         
@@ -60,7 +62,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
+    // alignItems: 'center',
     // выставляем карточки по центру в столбце
     paddingHorizontal: 16,
     backgroundColor: '#ffffff'
@@ -96,22 +98,3 @@ const styles = StyleSheet.create({
   },
 
 });
-
-// import React from 'react';
-// import { createStackNavigator } from '@react-navigation/stack';
-
-// import DefaultScreenPosts from '../nestedScreens/DefaultScreenPosts';
-// import CommentsScreen from '../nestedScreens/CommentsScreen';
-// import MapScreen from '../nestedScreens/MapScreen';
-
-// const NestedScreen = createStackNavigator();
-
-// export const PostsScreen = () => {
-//   return (
-//     <NestedScreen.Navigator>
-//       <NestedScreen.Screen component={DefaultScreenPosts} name='DefaultScreen' />
-//       <NestedScreen.Screen component={CommentsScreen} name='Comments' />
-//       <NestedScreen.Screen component={MapScreen} name='Map' />
-//     </NestedScreen.Navigator>
-//   );
-// };

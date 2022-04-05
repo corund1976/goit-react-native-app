@@ -24,7 +24,7 @@ const initialState = {
 
 export function RegisterScreen({ navigation }) {
   console.log('****** RegisterScreen *******');
-  
+
   const dispatch = useDispatch()
 
   const [state, setState] = useState(initialState)
@@ -52,9 +52,9 @@ export function RegisterScreen({ navigation }) {
   const handleSubmit = async () => {
     hideKeyboard();
     dispatch(authSignUpUser(state));
-    setState(initialState);     
+    setState(initialState);
   }
-  
+
   const onFocusNameInput = () => {
     setShowKeyboard(true);
     setFocusNameInput(true);
@@ -94,9 +94,11 @@ export function RegisterScreen({ navigation }) {
         >
 
           <View style={styles.form}>
-              
-            <AvatarContainer />
-                        
+
+            <View style={styles.avatar}>
+              <AvatarContainer />
+            </View>
+
             {/* Название формы */}
             <Text style={styles.formTitle}>
               Регистрация
@@ -164,7 +166,7 @@ export function RegisterScreen({ navigation }) {
               style={{ marginBottom: showKeyboard ? -97 : 78 }} /* 207-78=129-32=97 */
               activeOpacity={0.7}
               onPress={() => navigation.navigate('Login')}
-            > 
+            >
               <Text style={styles.link}>
                 Уже есть аккаунт? Войти
               </Text>
@@ -185,6 +187,11 @@ const styles = StyleSheet.create({
     flex: 1,
     resizeMode: 'cover',
     justifyContent: 'flex-end',
+  },
+  avatar: {
+    position: 'absolute',
+    top: -60,
+    left: 128,
   },
   form: {
     alignItems: 'center',
