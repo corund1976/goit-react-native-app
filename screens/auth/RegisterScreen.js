@@ -33,6 +33,7 @@ export function RegisterScreen({ navigation }) {
   const [focusNameInput, setFocusNameInput] = useState(false);
   const [focusEmailInput, setFocusEmailInput] = useState(false);
   const [focusPasswordInput, setFocusPasswordInput] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const nameInputHandler = (text) => {
     setState(prevState => ({ ...prevState, name: text }))
@@ -80,6 +81,10 @@ export function RegisterScreen({ navigation }) {
   const onBlurPasswordInput = () => {
     setShowKeyboard(false);
     setFocusPasswordInput(false);
+  }
+
+  const showHidePass = () => {
+    setShowPassword(!showPassword);
   }
 
   return (
@@ -134,29 +139,42 @@ export function RegisterScreen({ navigation }) {
               }}
             />
 
-            {/* Password */}
-            <TextInput
-              placeholder='Пароль'
-              placeholderTextColor='#BDBDBD'
-              secureTextEntry={true}
-              value={state.password}
-              onChangeText={passwordInputHandler}
-              onFocus={onFocusPasswordInput}
-              onBlur={onBlurPasswordInput}
-              style={{
-                ...styles.input,
-                borderColor: focusPasswordInput ? '#FF6C00' : '#E8E8E8',
-                backgroundColor: focusPasswordInput ? '#FFFFFF' : '#F6F6F6',
-              }}
-            />
+            <View style={styles.inputWrapper}>
+              {/* Password */}
+              <TextInput
+                placeholder='Пароль'
+                placeholderTextColor='#BDBDBD'
+                secureTextEntry={!showPassword ? true : false}
+                value={state.password}
+                onChangeText={passwordInputHandler}
+                onFocus={onFocusPasswordInput}
+                onBlur={onBlurPasswordInput}
+                style={{
+                  ...styles.input,
+                  borderColor: focusPasswordInput ? '#FF6C00' : '#E8E8E8',
+                  backgroundColor: focusPasswordInput ? '#FFFFFF' : '#F6F6F6',
+                }}
+              />
+
+              {/* Кнопка Show/Hide password */}
+              <TouchableOpacity
+                style={styles.btnShowpass}
+                activeOpacity={0.8}
+                onPress={showHidePass}
+              >
+                <Text style={styles.btnShowpassTitle}>
+                  показать
+                </Text>
+              </TouchableOpacity>
+            </View>
 
             {/* Кнопка Register */}
             <TouchableOpacity
-              style={styles.button}
+              style={styles.btnReg}
               activeOpacity={0.8}
               onPress={handleSubmit}
             >
-              <Text style={styles.buttonTitle}>
+              <Text style={styles.btnRegTitle}>
                 Зарегистрироваться
               </Text>
             </TouchableOpacity>
@@ -214,6 +232,11 @@ const styles = StyleSheet.create({
 
     marginBottom: 32,
   },
+
+  inputWrapper: {
+    position: "relative",
+  },
+
   input: {
     fontFamily: 'Roboto-Regular',
     fontSize: 16,
@@ -230,7 +253,22 @@ const styles = StyleSheet.create({
 
     marginBottom: 16,
   },
-  button: {
+
+  btnShowpass: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+  },
+  btnShowpassTitle: {
+    fontFamily: 'Roboto-Regular',
+    fontSize: 16,
+    lineHeight: 19,
+    textAlign: 'right',
+
+    color: '#1B4371',
+  },
+
+  btnReg: {
     backgroundColor: '#FF6C00',
     borderRadius: 100,
 
@@ -245,7 +283,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  buttonTitle: {
+  btnRegTitle: {
     fontFamily: 'Roboto-Regular',
     fontSize: 16,
     lineHeight: 19,

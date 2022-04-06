@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -28,6 +28,7 @@ export function LoginScreen({ navigation }) {
   const [showKeyboard, setShowKeyboard] = useState(false);
   const [focusEmailInput, setFocusEmailInput] = useState(false);
   const [focusPasswordInput, setFocusPasswordInput] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const emailInputHandler = (text) => {
     setState((prevState) => ({ ...prevState, email: text }))
@@ -47,7 +48,7 @@ export function LoginScreen({ navigation }) {
     dispatch(authSignInUser(state));
     setState(initialState);
   }
-  
+
   const onFocusEmailInput = () => {
     setShowKeyboard(true);
     setFocusEmailInput(true);
@@ -66,6 +67,10 @@ export function LoginScreen({ navigation }) {
     setFocusPasswordInput(false);
   }
 
+  const showHidePass = () => {
+    setShowPassword(!showPassword);
+  }
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS == 'ios' ? 'padding' : 'height'}
@@ -81,9 +86,9 @@ export function LoginScreen({ navigation }) {
           <View style={styles.form}>
 
             <Text style={styles.formTitle}>
-            Войти
+              Войти
             </Text>
-              
+
             <TextInput
               placeholder="Адрес электронной почты"
               placeholderTextColor='#BDBDBD'
@@ -97,43 +102,58 @@ export function LoginScreen({ navigation }) {
                 backgroundColor: focusEmailInput ? '#FFFFFF' : '#F6F6F6',
               }}
             />
-                          
-            <TextInput
-              placeholder="Пароль"
-              placeholderTextColor='#BDBDBD'
-              secureTextEntry={true}
-              value={state.password}
-              onChangeText={passwordInputHandler}
-              onFocus={onFocusPasswordInput}
-              onBlur={onBlurPasswordInput}
-              style={{
-                ...styles.input,
-                borderColor: focusPasswordInput ? '#FF6C00' : '#E8E8E8',
-                backgroundColor: focusPasswordInput ? '#FFFFFF' : '#F6F6F6',
-              }}
-            />
+
+            <View style={styles.inputWrapper}>
+              {/* Password */}
+              <TextInput
+                placeholder="Пароль"
+                placeholderTextColor='#BDBDBD'
+                secureTextEntry={!showPassword ? true : false}
+                value={state.password}
+                onChangeText={passwordInputHandler}
+                onFocus={onFocusPasswordInput}
+                onBlur={onBlurPasswordInput}
+                style={{
+                  ...styles.input,
+                  borderColor: focusPasswordInput ? '#FF6C00' : '#E8E8E8',
+                  backgroundColor: focusPasswordInput ? '#FFFFFF' : '#F6F6F6',
+                }}
+              />
+
+              {/* Кнопка Show/Hide password */}
+              <TouchableOpacity
+                style={styles.btnShowpass}
+                activeOpacity={0.8}
+                onPress={showHidePass}
+              >
+                <Text style={styles.btnShowpassTitle}>
+                  показать
+                </Text>
+              </TouchableOpacity>
+            </View>
+
 
             <TouchableOpacity
-              style={styles.button}
+              style={styles.btnLog}
               activeOpacity={0.8}
               onPress={handleSubmit}
-              >
-              <Text style={styles.buttonTitle}>
+            >
+              <Text style={styles.btnLogTitle}>
                 Войти
               </Text>
             </TouchableOpacity>
-              
-              
+
+
             <TouchableOpacity
               style={{ marginBottom: showKeyboard ? -97 : 144 }} /* 207-78=129-32=97 */
               activeOpacity={0.7}
               onPress={() => navigation.navigate('Register')}
             >
-              <Text style={styles.link}> 
+              <Text style={styles.link}>
                 Нет аккаунта? Зарегистрироваться
               </Text>
             </TouchableOpacity>
-            
+
           </View>
         </ImageBackground>
       </TouchableWithoutFeedback>
@@ -170,6 +190,11 @@ const styles = StyleSheet.create({
 
     marginBottom: 32,
   },
+
+  inputWrapper: {
+    position: "relative",
+  },
+
   input: {
     fontFamily: 'Roboto-Regular',
     fontSize: 16,
@@ -186,7 +211,22 @@ const styles = StyleSheet.create({
 
     marginBottom: 16,
   },
-  button: {
+
+  btnShowpass: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+  },
+  btnShowpassTitle: {
+    fontFamily: 'Roboto-Regular',
+    fontSize: 16,
+    lineHeight: 19,
+    textAlign: 'right',
+
+    color: '#1B4371',
+  },
+
+  btnLog: {
     backgroundColor: '#FF6C00',
     borderRadius: 100,
 
@@ -200,12 +240,13 @@ const styles = StyleSheet.create({
 
     alignItems: 'center'
   },
-  buttonTitle: {
+  btnLogTitle: {
     fontFamily: 'Roboto-Regular',
     fontSize: 16,
     lineHeight: 19,
     color: '#ffffff',
   },
+
   link: {
     fontFamily: 'Roboto-Regular',
     fontSize: 16,
