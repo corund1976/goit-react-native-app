@@ -103,7 +103,7 @@ export function LoginScreen({ navigation }) {
               }}
             />
 
-            <View style={styles.inputWrapper}>
+            <View style={styles.inputPassWrapper}>
               {/* Password */}
               <TextInput
                 placeholder="Пароль"
@@ -134,11 +134,11 @@ export function LoginScreen({ navigation }) {
 
 
             <TouchableOpacity
-              style={styles.btnLog}
+              style={styles.btnLogin}
               activeOpacity={0.8}
               onPress={handleSubmit}
             >
-              <Text style={styles.btnLogTitle}>
+              <Text style={styles.btnLoginTitle}>
                 Войти
               </Text>
             </TouchableOpacity>
@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
 
-  inputWrapper: {
+  inputPassWrapper: {
     position: "relative",
   },
 
@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
     color: '#1B4371',
   },
 
-  btnLog: {
+  btnLogin: {
     backgroundColor: '#FF6C00',
     borderRadius: 100,
 
@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
 
     alignItems: 'center'
   },
-  btnLogTitle: {
+  btnLoginTitle: {
     fontFamily: 'Roboto-Regular',
     fontSize: 16,
     lineHeight: 19,

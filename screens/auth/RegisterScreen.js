@@ -139,7 +139,7 @@ export function RegisterScreen({ navigation }) {
               }}
             />
 
-            <View style={styles.inputWrapper}>
+            <View style={styles.inputPassWrapper}>
               {/* Password */}
               <TextInput
                 placeholder='Пароль'
@@ -170,11 +170,11 @@ export function RegisterScreen({ navigation }) {
 
             {/* Кнопка Register */}
             <TouchableOpacity
-              style={styles.btnReg}
+              style={styles.btnRegister}
               activeOpacity={0.8}
               onPress={handleSubmit}
             >
-              <Text style={styles.btnRegTitle}>
+              <Text style={styles.btnRegisterTitle}>
                 Зарегистрироваться
               </Text>
             </TouchableOpacity>
@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
 
-  inputWrapper: {
+  inputPassWrapper: {
     position: "relative",
   },
 
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
     color: '#1B4371',
   },
 
-  btnReg: {
+  btnRegister: {
     backgroundColor: '#FF6C00',
     borderRadius: 100,
 
@@ -283,12 +283,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  btnRegTitle: {
+  btnRegisterTitle: {
     fontFamily: 'Roboto-Regular',
     fontSize: 16,
     lineHeight: 19,
     color: '#ffffff',
   },
+
   link: {
     fontFamily: 'Roboto-Regular',
     fontSize: 16,
