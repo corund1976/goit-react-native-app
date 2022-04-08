@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react';
 import { StyleSheet, TextInput, TouchableOpacity, Text, View, FlatList, Image, KeyboardAvoidingView, Platform, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import { useSelector } from 'react-redux';
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 
 import { db } from "../../firebase/config";
 
@@ -24,10 +25,9 @@ export function CommentsScreen({ route }) {
 
   const createComment = async () => {
     if (newComment) {
-      await db
-      .collection("posts")
-      .doc(postId)
-      .update({
+      const docRef = doc(db, 'posts', postId)
+      
+      await updateDoc(docRef, {
         comments: [...allComments, { comment: newComment, userAvatar, userEmail, userName, commentDate: Date.now() }]
       });
     };   
@@ -37,12 +37,10 @@ export function CommentsScreen({ route }) {
   }
 
   const getAllComments = async () => {
-    const data = await db
-      .collection("posts")
-      .doc(postId)
-      .get();
+    const docRef = doc(db, 'posts', postId)
+    const docSnap = await getDoc(docRef);
     
-    setAllComments(data.data().comments);
+    setAllComments(docSnap.data().comments);
   }
 
   const commentInputHandler = (text) => {

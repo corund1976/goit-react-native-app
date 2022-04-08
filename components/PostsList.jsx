@@ -3,6 +3,7 @@ import { View, TouchableOpacity, Text, StyleSheet, Image, FlatList } from 'react
 import { Feather } from '@expo/vector-icons';
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from 'react-redux';
+import { doc, updateDoc } from "firebase/firestore";
 
 import { db } from '../firebase/config';
 
@@ -14,13 +15,11 @@ export function PostsList({ posts }) {
     const userExist = likeUserIdsArray.find(user => user === userId)
 
     if (!userExist) {
-      await db
-        .collection("posts")
-        .doc(postId)
-        .update({
-          likes: [...likeUserIdsArray, userId]
-        });
-      }
+      const docRef = doc(db, 'posts', postId)
+      await updateDoc(docRef, {
+        likes: [...likeUserIdsArray, userId]
+      });
+    }
   }
   
   return (

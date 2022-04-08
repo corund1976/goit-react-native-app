@@ -1,6 +1,7 @@
-// import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
-import { authSlice } from './authReducer';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, updateProfile, signOut } from "firebase/auth";
+
 import { auth } from "../../firebase/config";
+import { authSlice } from './authReducer';
 
 const { updateUserProfile, updateUserAvatar, changeAuthStatus, signOutUser } = authSlice.actions;
 
@@ -9,16 +10,16 @@ export const authSignUpUser = ({ name, email, password }) => async (dispatch, ge
     // Берем из стейта Редакса Аватарку для дальнейшей Регистрации
     const userAvatar = getState().auth.userAvatar;
     // Потому что на этом шаге стейт затирается
-    await auth.createUserWithEmailAndPassword(email, password);
+    await createUserWithEmailAndPassword(auth, email, password);
 
-    const user = await auth.currentUser;
+    const user = auth.currentUser;
 
-    await user.updateProfile({
+    await updateProfile(user, {
       photoURL: userAvatar,
       displayName: name,
     })
 
-    const userUpdated = await auth.currentUser;
+    const userUpdated = auth.currentUser;
 
     const userUpdatedProfile = {
       id: userUpdated.uid,
@@ -48,10 +49,10 @@ export const authSignUpUser = ({ name, email, password }) => async (dispatch, ge
     console.log(error);
   };
 };
-    
+
 export const authSignInUser = ({ email, password }) => async (dispatch, getState) => {
   try {
-    const user = await auth.signInWithEmailAndPassword(email, password);
+    const user = await signInWithEmailAndPassword(auth, email, password);
   } catch (error) {
     // Handle Errors here.
     const errorCode = error.code;
@@ -73,9 +74,9 @@ export const authSignInUser = ({ email, password }) => async (dispatch, getState
     console.log(error);
   };
 };
-  
+
 export const changeAuthStatusUser = () => async (dispatch, getState) => {
-  await auth.onAuthStateChanged(user => {
+  await onAuthStateChanged(auth, user => {
     if (user) {
       const userUpdatedProfile = {
         id: user.uid,
@@ -91,19 +92,19 @@ export const changeAuthStatusUser = () => async (dispatch, getState) => {
 };
 
 export const changeAvatarUser = (processedAvatarURL) => async (dispatch, getState) => {
-  const user = await auth.currentUser;
+  const user = auth.currentUser;
   // Проверка: это 'Регистрация' или 'Профиль'. Если 'Регистрация', то user еще не существует...
   if (user !== null) {
-    await user.updateProfile({
+    await updateProfile(user, {
       photoURL: processedAvatarURL,
-    })  
+    })
   }
   // Запись в стейт Редакса Аватарки, чтобы при Регистрации "authSignUpUser" взяла оттуда данные
   dispatch(updateUserAvatar({ avatar: processedAvatarURL }));
 };
 
 export const authSignOutUser = () => async (dispatch, getState) => {
-  await auth.signOut();
+  await signOut(auth);
 
   dispatch(signOutUser());
 };

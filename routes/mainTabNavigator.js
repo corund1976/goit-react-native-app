@@ -12,7 +12,7 @@ export function MainTabNavigator() {
   return (
     <MainTab.Navigator
       initialRouteName={HomeScreen}
-      screenOptions={{      
+      screenOptions={{
         // headerShown: false,
         headerTitleAlign: 'center',
         headerTitleStyle: {
@@ -42,20 +42,20 @@ export function MainTabNavigator() {
         name='Home'
         component={HomeScreen}
         options={({ route }) => {
-          console.log(route.name);
+          console.log('HomeScreen route.name = ', route.name);
           // console.log(getFocusedRouteNameFromRoute(route));
           return {
             headerShown: false,
             tabBarStyle: {
               display:
-              // getFocusedRouteNameFromRoute(route) === 'Home' ? 'flex' : 'none',
+                // getFocusedRouteNameFromRoute(route) === 'Home' ? 'flex' : 'none',
                 route.name === 'Home' ? 'flex' : 'none',
             },
             tabBarIcon: ({ focused, size, color }) => (
               <Ionicons name="grid-outline" size={24} color={color} />
             ),
           }
-        }}       
+        }}
       />
       <MainTab.Screen
         name='Create'

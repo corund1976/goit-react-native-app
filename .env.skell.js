@@ -1,0 +1,1 @@
+export const REACT_APP_KEY_FIREBASE = "AIzaSyDAibk8a05vmgMrrznutGtiFBbXRNDtEP0";

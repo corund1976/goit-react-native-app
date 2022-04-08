@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import { useSelector } from 'react-redux';
+import { collection, onSnapshot, query } from "firebase/firestore";
 
 import { db } from '../../firebase/config';
 import { PostsList } from '../../components';
@@ -13,10 +14,11 @@ export function PostsScreen () {
   const [posts, setPosts] = useState([])
   
   const getAllPosts = async () => {
-    db.collection('posts')
-      .onSnapshot(data =>
-        setPosts(data.docs.map(doc => ({ ...doc.data(), postId: doc.id, })))
-      )
+    const q = query(collection(db, "posts"));
+    
+    onSnapshot(q, (querySnapshot) => {
+      setPosts(querySnapshot.docs.map(doc => ({ ...doc.data(), postId: doc.id, })))
+    })
   }
       
   useEffect(() => {

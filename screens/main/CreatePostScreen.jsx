@@ -5,11 +5,10 @@ import * as Location from 'expo-location';
 import * as ImagePicker from 'expo-image-picker';
 import { Feather, MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { useSelector } from 'react-redux';
+import { collection, addDoc } from "firebase/firestore";
 
-import { storage, db } from '../../firebase/config';
-// import { collection } from "firebase/firestore";
-// import { ref } from "firebase/storage";
-
+import uploadImageToStorage from '../../helpers/uploadImage'
+import { db } from '../../firebase/config';
 
 const initialState = {
   photo: null,
@@ -100,27 +99,11 @@ export const CreatePostScreen = ({ navigation }) => {
     }
   }
 
-  const uploadPhotoToServer = async () => {
-    console.log('!!!! start uploading Photo to Storage !!!!');
-
-    const response = await fetch(state.photo);
-    const file = await response.blob();
-    const id = Date.now().toString();
-
-    await storage.ref(`images/${id}`).put(file);
-
-    const processedPhotoURL = await storage.ref('images').child(`${id}`).getDownloadURL();
-
-    console.log('!!!! photo uploaded to Storage successfully !!!!');
-
-    return processedPhotoURL;
-  }
-
   const uploadPostToServer = async () => {
     setIsLoading(true);
 
-    const photo = await uploadPhotoToServer();
-    const { description, locality } = state;
+    const { photo, description, locality } = state;
+    const photoURL = await uploadImageToStorage(photo, 'images/');
 
     console.log('!!!! start getting geolocation !!!!');
 
@@ -129,7 +112,7 @@ export const CreatePostScreen = ({ navigation }) => {
     console.log('!!!! geolocation is ready !!!!');
 
     const newPost = {
-      photo,
+      photo: photoURL,
       description,
       locality,
       latitude,
@@ -140,8 +123,8 @@ export const CreatePostScreen = ({ navigation }) => {
       likes: []
     }
 
-    console.log('!!!! created new Post:');
-    await db.collection("posts").add(newPost);    
+    console.log('!!!! created new Post');
+    await addDoc(collection(db, "posts"), newPost);    
     
     setIsLoading(false);
     console.log('!!!! post uploaded to Firebase');
@@ -160,7 +143,8 @@ export const CreatePostScreen = ({ navigation }) => {
         <Camera
           style={styles.camera}
           type={typeCamera}
-          autoFocus='on'
+          autoFocus='auto'
+          flashMode='auto'
           ref={(ref) => setCameraRef(ref)}
         >
           {/* Просмотр полученной фото */}
@@ -402,12 +386,3 @@ const styles = StyleSheet.create({
     height: 24,
   },
 });
-
-      // setState(prevState => ({
-      //   ...prevState,
-      //   photo: picture.uri,
-      //   location: {
-      //     latitude: location.coords.latitude,
-      //     longitude: location.coords.longitude,
-      //   }
-      // }));

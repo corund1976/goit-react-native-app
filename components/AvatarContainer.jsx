@@ -5,7 +5,7 @@ import { Ionicons} from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { changeAvatarUser } from '../redux/auth/authOperations';
-import { storage } from '../firebase/config';
+import uploadImageToStorage from '../helpers/uploadImage'
 
 const defaultAvatar = '../assets/images/default-avatar.png';
 
@@ -15,21 +15,7 @@ export function AvatarContainer() {
   
   const [avatar, setAvatar] = useState(userAvatar);
   
-  const uploadAvatarToStorage = async (avatar) => {
-    console.log('!!!! start uploading Avatar to Storage !!!!');
-    
-    const response = await fetch(avatar);
-    const file = await response.blob();
-    const id = Date.now().toString();
-    
-    await storage.ref(`avatars/${id}`).put(file);
-      
-    const processedAvatarURL = await storage.ref('avatars').child(`${id}`).getDownloadURL();
-    console.log('!!!! Avatar uploaded to Storage successfully !!!!');
-    return processedAvatarURL;
-  }
-
-  const avatarAddHandler = async () => {
+    const avatarAddHandler = async () => {
     // No permissions request is necessary for launching the image library
     const imageFromGallery = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -40,8 +26,10 @@ export function AvatarContainer() {
 
     if (!imageFromGallery.cancelled) {
       setAvatar(imageFromGallery.uri);
-      const processedAvatarURL = await uploadAvatarToStorage(imageFromGallery.uri)
-      dispatch(changeAvatarUser(processedAvatarURL));    
+
+      const avatarURL = await uploadImageToStorage(imageFromGallery.uri, 'avatars/')
+
+      dispatch(changeAvatarUser(avatarURL));    
     }
   };
   

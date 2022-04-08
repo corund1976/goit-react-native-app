@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { View, ImageBackground, TouchableOpacity, Text, StyleSheet, Image } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
+import { collection, onSnapshot, query, where } from "firebase/firestore";
 
 import { db } from '../../firebase/config';
 import { authSignOutUser } from '../../redux/auth/authOperations';
-
 import { PostsList } from '../../components';
 import { AvatarContainer } from '../../components';
 
@@ -25,9 +25,10 @@ export function ProfileScreen() {
   }, [])
   
   const getAllUserPosts = async () => {
-    db.collection("posts").where("userId", "==", userId)
-      .onSnapshot(data =>
-        setUserPosts(data.docs.map(doc => ({ ...doc.data(), postId: doc.id, })))
+    const q = query(collection(db, "posts"), where("userId", "==", userId));
+    
+    onSnapshot(q, (querySnapshot) =>
+        setUserPosts(querySnapshot.docs.map(doc => ({ ...doc.data(), postId: doc.id, })))
       )
   }
 
