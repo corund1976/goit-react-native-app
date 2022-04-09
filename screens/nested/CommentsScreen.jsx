@@ -1,13 +1,11 @@
 import React, {useState, useEffect} from 'react';
 import {
   StyleSheet,
-  Text,
   View,
+  Text,
   TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
-  
-  Platform,
   Keyboard,
   Image,
   FlatList,
@@ -89,12 +87,8 @@ export function CommentsScreen({ route }) {
   }
 
   return (
-    <KeyboardAwareScrollView
-      // behavior={Platform.OS == 'ios' ? 'padding' : 'height'}
-      style={styles.container}
-    >
+    <KeyboardAwareScrollView style={styles.container}>
       <TouchableWithoutFeedback onPress={hideKeyboard}>
-
         <View>
           {/* Пост фото */}
           <Image style={styles.postImage} source={{ uri: postImage }} />
@@ -164,7 +158,6 @@ export function CommentsScreen({ route }) {
 
           </View>
         </View>
-
       </TouchableWithoutFeedback>
     </KeyboardAwareScrollView>
   );
