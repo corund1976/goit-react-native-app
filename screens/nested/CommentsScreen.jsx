@@ -1,5 +1,18 @@
 import React, {useState, useEffect} from 'react';
-import { StyleSheet, TextInput, TouchableOpacity, Text, View, FlatList, Image, KeyboardAvoidingView, Platform, Keyboard, TouchableWithoutFeedback } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  
+  Platform,
+  Keyboard,
+  Image,
+  FlatList,
+} from 'react-native';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import { AntDesign } from '@expo/vector-icons';
 import { useSelector } from 'react-redux';
 import { doc, getDoc, updateDoc } from "firebase/firestore";
@@ -76,8 +89,8 @@ export function CommentsScreen({ route }) {
   }
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS == 'ios' ? 'padding' : 'height'}
+    <KeyboardAwareScrollView
+      // behavior={Platform.OS == 'ios' ? 'padding' : 'height'}
       style={styles.container}
     >
       <TouchableWithoutFeedback onPress={hideKeyboard}>
@@ -153,16 +166,16 @@ export function CommentsScreen({ route }) {
         </View>
 
       </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
+    </KeyboardAwareScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    // backgroundColor: '#fff',
     // alignItems: 'center',
-    // justifyContent: 'center',
+    // justifyContent: 'flex-end',
   },
   postImage: {
     borderRadius: 8,
@@ -207,7 +220,7 @@ const styles = StyleSheet.create({
     position: "relative",
     minHeight: 50,
     marginHorizontal: 16,
-    justifyContent: "center",
+    justifyContent: 'center',
   },
   input: {
     backgroundColor: "#F6F6F6",
