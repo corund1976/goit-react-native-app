@@ -1,6 +1,6 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-// import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
+import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import { Ionicons, Feather } from '@expo/vector-icons';
 
 import { HomeScreen, CreatePostScreen, ProfileScreen } from '../screens/main';
@@ -43,13 +43,13 @@ export function MainTabNavigator() {
         component={HomeScreen}
         options={({ route }) => {
           console.log('HomeScreen route.name = ', route.name);
-          // console.log(getFocusedRouteNameFromRoute(route));
+          console.log('getFocusedRouteNameFromRoute(route) = ', getFocusedRouteNameFromRoute(route));
           return {
             headerShown: false,
             tabBarStyle: {
               display:
-                // getFocusedRouteNameFromRoute(route) === 'Home' ? 'flex' : 'none',
-                route.name === 'Home' ? 'flex' : 'none',
+                getFocusedRouteNameFromRoute(route) === 'Posts' ? 'flex' : 'none',
+              // route.name === 'Home' ? 'flex' : 'none',
             },
             tabBarIcon: ({ focused, size, color }) => (
               <Ionicons name="grid-outline" size={24} color={color} />
