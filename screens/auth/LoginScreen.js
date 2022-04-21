@@ -11,9 +11,9 @@ import {
   Keyboard,
   ImageBackground,
 } from 'react-native';
-import { useDispatch } from "react-redux";
+import { useDispatch } from 'react-redux';
 
-import { authSignInUser } from "../../redux/auth/authOperations";
+import { authSignInUser } from '../../redux/auth/authOperations';
 
 const initialState = {
   email: '',
@@ -73,7 +73,7 @@ export function LoginScreen({ navigation }) {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS == 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
     >
       <TouchableWithoutFeedback onPress={hideKeyboard}>
@@ -90,7 +90,7 @@ export function LoginScreen({ navigation }) {
             </Text>
 
             <TextInput
-              placeholder="Адрес электронной почты"
+              placeholder='Адрес электронной почты'
               placeholderTextColor='#BDBDBD'
               value={state.email}
               onChangeText={emailInputHandler}
@@ -106,7 +106,7 @@ export function LoginScreen({ navigation }) {
             <View style={styles.inputPassWrapper}>
               {/* Password */}
               <TextInput
-                placeholder="Пароль"
+                placeholder='Пароль'
                 placeholderTextColor='#BDBDBD'
                 secureTextEntry={!showPassword ? true : false}
                 value={state.password}
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
   },
 
   inputPassWrapper: {
-    position: "relative",
+    position: 'relative',
   },
 
   input: {

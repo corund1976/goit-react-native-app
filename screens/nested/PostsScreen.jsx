@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import { useSelector } from 'react-redux';
-import { collection, onSnapshot, query } from "firebase/firestore";
+import { collection, onSnapshot, query } from 'firebase/firestore';
 
 import { db } from '../../firebase/config';
 import { PostsList } from '../../components';
@@ -14,7 +14,7 @@ export function PostsScreen () {
   const [posts, setPosts] = useState([])
   
   const getAllPosts = async () => {
-    const q = query(collection(db, "posts"));
+    const q = query(collection(db, 'posts'));
     
     onSnapshot(q, (querySnapshot) => {
       setPosts(querySnapshot.docs.map(doc => ({ ...doc.data(), postId: doc.id, })))
@@ -23,7 +23,7 @@ export function PostsScreen () {
       
   useEffect(() => {
     getAllPosts();
-    console.log('useEffect "getAllPosts"  @postScreen@ ');
+    console.log('useEffect *getAllPosts*  @PostsScreen@');
   }, []);
 
   const { userAvatar, userName, userEmail } = useSelector(state => state.auth);
@@ -63,9 +63,8 @@ export function PostsScreen () {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    // alignItems: 'center',
-    // выставляем карточки по центру в столбце
+    alignItems: 'center',
+    // justifyContent: 'center',
     paddingHorizontal: 16,
     backgroundColor: '#ffffff'
   },
@@ -75,6 +74,7 @@ const styles = StyleSheet.create({
 
     marginTop: 32,
     marginBottom: 32,
+    marginRight: 'auto'
   },
   avatar: {
     borderRadius: 16,
@@ -98,5 +98,4 @@ const styles = StyleSheet.create({
 
     color: '#21212180'
   },
-
 });

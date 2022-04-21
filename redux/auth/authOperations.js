@@ -1,6 +1,6 @@
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, updateProfile, signOut } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, updateProfile, signOut } from 'firebase/auth';
 
-import { auth } from "../../firebase/config";
+import { auth } from '../../firebase/config';
 import { authSlice } from './authReducer';
 
 const { updateUserProfile, updateUserAvatar, changeAuthStatus, signOutUser } = authSlice.actions;
@@ -99,7 +99,7 @@ export const changeAvatarUser = (processedAvatarURL) => async (dispatch, getStat
       photoURL: processedAvatarURL,
     })
   }
-  // Запись в стейт Редакса Аватарки, чтобы при Регистрации "authSignUpUser" взяла оттуда данные
+  // Запись в стейт Редакса Аватарки, чтобы при Регистрации 'authSignUpUser' взяла оттуда данные
   dispatch(updateUserAvatar({ avatar: processedAvatarURL }));
 };
 

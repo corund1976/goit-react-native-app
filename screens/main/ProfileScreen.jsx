@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, ImageBackground, TouchableOpacity, Text, StyleSheet, Image } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
-import { collection, onSnapshot, query, where } from "firebase/firestore";
+import { collection, onSnapshot, query, where } from 'firebase/firestore';
 
 import { db } from '../../firebase/config';
 import { authSignOutUser } from '../../redux/auth/authOperations';
@@ -21,11 +21,11 @@ export function ProfileScreen() {
 
   useEffect(() => {
     getAllUserPosts();
-    console.log('useEffect "getAllUserPosts"  @ProfileScreen@ ');
+    console.log('useEffect *getAllUserPosts*  @ProfileScreen@');
   }, [])
   
   const getAllUserPosts = async () => {
-    const q = query(collection(db, "posts"), where("userId", "==", userId));
+    const q = query(collection(db, 'posts'), where('userId', '==', userId));
     
     onSnapshot(q, (querySnapshot) =>
         setUserPosts(querySnapshot.docs.map(doc => ({ ...doc.data(), postId: doc.id, })))
@@ -56,7 +56,7 @@ export function ProfileScreen() {
             activeOpacity={0.8}
             onPress={signOut}
           >
-            <MaterialIcons name="logout" size={24} color={'#BDBDBD'} />
+            <MaterialIcons name='logout' size={24} color={'#BDBDBD'} />
           </TouchableOpacity>
 
           {/* Профиль имя */}
@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
   },
   profile: {
     flex: 1,
-    // alignItems: 'center',
+    alignItems: 'center',
     // выставляем карточки по центру в столбце
 
     backgroundColor: '#FFFFFF',
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
   avatar: {
     position: 'absolute',
     top: -60,
-    left: 128,
+    // left: 128,
   },
   logoutButton: {
     position: 'absolute',

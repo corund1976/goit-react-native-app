@@ -6,16 +6,17 @@ import {
   TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
+  KeyboardAvoidingView,
+  Platform,
   Keyboard,
   Image,
   FlatList,
 } from 'react-native';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import { AntDesign } from '@expo/vector-icons';
 import { useSelector } from 'react-redux';
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 
-import { db } from "../../firebase/config";
+import { db } from '../../firebase/config';
 
 export function CommentsScreen({ route }) {
   console.log('****** CommentsScreen *******');
@@ -31,7 +32,7 @@ export function CommentsScreen({ route }) {
   
   useEffect(() => {
     getAllComments()
-    console.log('useEffect "getAllComments"  @CommentsScreen@ ');
+    console.log('useEffect *getAllComments*  @CommentsScreen@ ');
   }, []);
 
   const createComment = async () => {
@@ -39,7 +40,16 @@ export function CommentsScreen({ route }) {
       const docRef = doc(db, 'posts', postId)
       
       await updateDoc(docRef, {
-        comments: [...allComments, { comment: newComment, userAvatar, userEmail, userName, commentDate: Date.now() }]
+        comments: [
+          ...allComments,
+          {
+            comment: newComment,
+            userAvatar,
+            userEmail,
+            userName,
+            commentDate: Date.now(),
+          }
+        ]
       });
     };   
     
@@ -72,24 +82,27 @@ export function CommentsScreen({ route }) {
   }
 
   const timestampToDate = (timestamp) => {
-    const formattedDate = new Date(timestamp).toLocaleString("ru", {
+    const formattedDate = new Date(timestamp).toLocaleString('ru', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
       // weekday: 'long',
-      timezone: 'UTC',
+      // timezone: 'UTC',
       hour: 'numeric',
       minute: 'numeric',
       // second: 'numeric'
     });
-    
+
     return (formattedDate);
   }
 
   return (
-    <KeyboardAwareScrollView style={styles.container}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS == 'ios' ? 'padding' : 'height'}
+      style={styles.container}
+    >
       <TouchableWithoutFeedback onPress={hideKeyboard}>
-        <View>
+        <View style={styles.inner}>
           {/* Пост фото */}
           <Image style={styles.postImage} source={{ uri: postImage }} />
           
@@ -102,7 +115,7 @@ export function CommentsScreen({ route }) {
               // Контейнер комментария
               <View style={{
                 marginBottom: 24,
-                flexDirection: item.userEmail !== userEmail ? "row" : "row-reverse"
+                flexDirection: item.userEmail !== userEmail ? 'row' : 'row-reverse'
               }}>
                 {/* Аватарка комментария */}
                 <Image
@@ -122,7 +135,7 @@ export function CommentsScreen({ route }) {
                     borderTopRightRadius: item.userEmail !== userEmail ? 6 : 0,
                     borderBottomLeftRadius: 6,
                     borderBottomRightRadius: 6,
-                    backgroundColor: "#00000008",
+                    backgroundColor: '#00000008',
                     padding: 16,
                   }}
                 >
@@ -135,7 +148,10 @@ export function CommentsScreen({ route }) {
           />
 
           {/* Форма ввода комментария */}
-          <View style={styles.form}>
+          <View style={{
+            ...styles.form,
+            marginBottom: showKeyboard ? 105 : 16,
+          }}>
 
             {/* Comment */}
             <TextInput
@@ -151,86 +167,62 @@ export function CommentsScreen({ route }) {
             {/* Кнопка Отправить комментарий */}
             <TouchableOpacity
               style={styles.button}
+              activeOpacity={0.7}
               onPress={createComment}
             >
-              <AntDesign name="arrowup" size={20} color="#ffffff" />
+              <AntDesign name='arrowup' size={20} color='#ffffff' />
             </TouchableOpacity>
 
           </View>
         </View>
       </TouchableWithoutFeedback>
-    </KeyboardAwareScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // backgroundColor: '#fff',
-    // alignItems: 'center',
-    // justifyContent: 'flex-end',
   },
+  inner: {
+    flex: 1,
+    justifyContent: 'space-between',
+  },  
   postImage: {
+    flex: 1,
     borderRadius: 8,
-
     // width: 343,
     height: 240,
-
     marginHorizontal: 16,
-    marginTop: 32,
-    marginBottom: 32,
-    
+    marginVertical: 32,
   },
   list: {
+    flex: 1,
+
     marginHorizontal: 16,
-    marginBottom: 31,
-    // maxHeight: 323,
   },
-  // commentContainer: {
-  //   flexDirection: 'row',
-  //   marginBottom: 24,
-  // },
-  // avatar: {
-  //   borderRadius: 50,
-
-  //   width: 28,
-  //   height: 28,
-
-  //   marginRight: 16,
-  // },
-  // comment: {
-  //   borderTopLeftRadius: 0,
-  //   borderTopRightRadius: 6,
-
-  //   borderBottomLeftRadius: 6,
-  //   borderBottomRightRadius: 6,
-    
-  //   backgroundColor: "#00000008",
-
-  //   padding: 16,
-  // },
   form: {
-    position: "relative",
-    minHeight: 50,
-    marginHorizontal: 16,
     justifyContent: 'center',
+    height: 80,
+    marginHorizontal: 16,
+    marginTop: 16,
   },
   input: {
-    backgroundColor: "#F6F6F6",
+    backgroundColor: '#F6F6F6',
     borderColor: '#E8E8E8',
     borderRadius: 100,
     borderWidth: 1,
     paddingHorizontal: 16,
-    flex: 1,
+    minHeight: 50,
   },
   button: {
     position: 'absolute',
     right: 8,
     borderRadius: 50,
-    backgroundColor: "#FF6C00",
+    backgroundColor: '#FF6C00',
     width: 34,
     height: 34,
-    alignItems: "center",
-    justifyContent: "center"
+    alignItems: 'center',
+    justifyContent: 'center'
   }
 });

@@ -1,5 +1,13 @@
 import React from 'react';
-import { View, TouchableOpacity, Text, StyleSheet, Image, FlatList } from 'react-native';
+import {
+  View,
+  TouchableOpacity,
+  Text,
+  StyleSheet,
+  Image,
+  FlatList,
+  useWindowDimensions,
+} from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from 'react-redux';
@@ -8,6 +16,9 @@ import { doc, updateDoc } from "firebase/firestore";
 import { db } from '../firebase/config';
 
 export function PostsList({ posts }) {
+  const windowWidth = useWindowDimensions().width;
+  const windowHeight = useWindowDimensions().height;
+
   const navigation = useNavigation();
   const { userId } = useSelector(state => state.auth);
 
@@ -25,7 +36,7 @@ export function PostsList({ posts }) {
   return (
     <FlatList
       data={posts}
-      // numColumns={2}
+      numColumns={ (windowWidth > windowHeight) ? 2 : 1}
       keyExtractor={(item, index) => index.toString()}
       renderItem={({ item }) => (
         <View style={styles.listItem}>
@@ -99,15 +110,13 @@ const styles = StyleSheet.create({
   listItem: {
     width: 375,
 
-    // alignItems: 'center',
-    // justifyContent: 'center',
-    
+    marginHorizontal: 10,
     marginBottom: 32,
   },
   image: {
     borderRadius: 8,
 
-    width: '100%',
+    // width: '100%',
     height: 240,
 
     marginBottom: 8,
@@ -130,7 +139,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   numberComments: {
-    fontWeight: '400',
     fontSize: 16,
     lineHeight: 19,
 
@@ -143,7 +151,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   locationLink: {
-    fontWeight: '400',
     fontSize: 16,
     lineHeight: 19,
     textDecorationLine: 'underline',

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import {
   StyleSheet,
-  Text,
   View,
+  Text,
   TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
@@ -97,18 +97,14 @@ export function RegisterScreen({ navigation }) {
           source={require('../../assets/images/PhotoBG.png')}
           style={styles.bgImage}
         >
-
           <View style={styles.form}>
-
             <View style={styles.avatar}>
               <AvatarContainer />
             </View>
-
             {/* Название формы */}
             <Text style={styles.formTitle}>
               Регистрация
             </Text>
-
             {/* Name */}
             <TextInput
               placeholder='Имя'
@@ -123,7 +119,6 @@ export function RegisterScreen({ navigation }) {
                 backgroundColor: focusNameInput ? '#FFFFFF' : '#F6F6F6',
               }}
             />
-
             {/* Email */}
             <TextInput
               placeholder='Адрес электронной почты'
@@ -167,7 +162,6 @@ export function RegisterScreen({ navigation }) {
                 </Text>
               </TouchableOpacity>
             </View>
-
             {/* Кнопка Register */}
             <TouchableOpacity
               style={styles.btnRegister}
@@ -178,7 +172,6 @@ export function RegisterScreen({ navigation }) {
                 Зарегистрироваться
               </Text>
             </TouchableOpacity>
-
             {/* Cсылка на  страницу Login */}
             <TouchableOpacity
               style={{ marginBottom: showKeyboard ? -97 : 78 }} /* 207-78=129-32=97 */
@@ -199,17 +192,12 @@ export function RegisterScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'flex-end'
   },
   bgImage: {
-    flex: 1,
     resizeMode: 'cover',
+    flex: 1,
     justifyContent: 'flex-end',
-  },
-  avatar: {
-    position: 'absolute',
-    top: -60,
-    left: 128,
+    // alignItems: 'center',
   },
   form: {
     alignItems: 'center',
@@ -219,8 +207,11 @@ const styles = StyleSheet.create({
 
     paddingTop: 92,
     paddingHorizontal: 16,
-
-    // position: 'relative'
+  },
+  avatar: {
+    position: 'absolute',
+    top: -60,
+    // left: 128,
   },
   formTitle: {
     fontFamily: 'Roboto-Medium',
@@ -234,7 +225,7 @@ const styles = StyleSheet.create({
   },
 
   inputPassWrapper: {
-    position: "relative",
+    position: 'relative',
   },
 
   input: {

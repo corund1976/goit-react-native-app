@@ -1,6 +1,5 @@
-import React from 'react';
-import { StyleSheet, View } from 'react-native';
-// import { StatusBar } from 'expo-status-bar';
+import React, { useEffect } from 'react';
+import { StyleSheet, View, LogBox } from 'react-native';
 import AppLoading from 'expo-app-loading';
 import { useFonts } from 'expo-font'
 import { Provider } from 'react-redux';
@@ -9,6 +8,11 @@ import { store } from './redux/store';
 import { Router } from './routes';
 
 function App() {
+  console.log('App.js');
+  useEffect(() => {
+    LogBox.ignoreLogs(['Warning: Async Storage has been extracted from react-native core']);
+  }, [])
+
   let [fontsLoaded] = useFonts({
     'Roboto-Regular': require('./assets/fonts/Roboto-Regular.ttf'),
     'Roboto-Medium': require('./assets/fonts/Roboto-Medium.ttf'),

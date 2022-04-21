@@ -5,8 +5,11 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
+  KeyboardAvoidingView,
+  Platform,
+  Keyboard,
   Image,
-  Alert,
   ActivityIndicator
 } from 'react-native';
 import { Camera } from 'expo-camera';
@@ -18,6 +21,7 @@ import { collection, addDoc } from "firebase/firestore";
 
 import uploadImageToStorage from '../../helpers/uploadImage'
 import { db } from '../../firebase/config';
+import { calculateBackoffMillis } from '@firebase/util';
 
 const initialState = {
   photo: null,
@@ -35,20 +39,56 @@ export const CreatePostScreen = ({ navigation }) => {
 
   const [cameraRef, setCameraRef] = useState(null);
   const [typeCamera, setTypeCamera] = useState(Camera.Constants.Type.back);
-
+  const [availableRatios, setAvailableRatios] = useState([]);
+  const [ratioCamera, setRatioCamera] = useState('4:3');
+  const [availablePictureSizes, setAvailablePictureSizes] = useState([]);
+  const [pictureSizeCamera, setPictureSizeCamera] = useState('640x480');
+  
   const [isLoading, setIsLoading] = useState(false);
+
+  const [showKeyboard, setShowKeyboard] = useState(false);
      
   const { userId, userName } = useSelector(state => state.auth);
 
+  const getSupportedRatios = async () => {
+    if (Platform.OS == 'android') {
+      const supportedRatios = await cameraRef.getSupportedRatiosAsync();
+      console.log('#76 SupportedRatios', supportedRatios);
+      setAvailableRatios(supportedRatios);
+    }
+  };
+
+  const getAvailablePictureSizes = async () => {
+    if (Platform.OS == 'android') {
+      console.log('$83 Ratio', ratioCamera);
+
+      const availablePictureSizes = await cameraRef.getAvailablePictureSizesAsync(ratioCamera);
+
+      setAvailablePictureSizes(availablePictureSizes);
+
+      console.log('#86 availablePictureSizes', availablePictureSizes);
+
+      setPictureSizeCamera(availablePictureSizes[0])
+
+      console.log('PictureSize=', availablePictureSizes[0]);
+    }
+  };
+
   useEffect(() => {
+    getSupportedRatios();
+    getAvailablePictureSizes();
+    
     (async () => {
+      console.log('createPost useEffect');
+
       let cameraPermission = await Camera.requestCameraPermissionsAsync();
       setHasPermissionCamera(cameraPermission.status === 'granted');
     
       let locationPermission = await Location.requestForegroundPermissionsAsync();
       setHasPermissionLocation(locationPermission.status === 'granted');
+
     })();
-  }, []);
+  }, [ratioCamera]);
 
   if (hasPermissionCamera === null) {
     return <View />;
@@ -63,7 +103,7 @@ export const CreatePostScreen = ({ navigation }) => {
   if (hasPermissionLocation === false) {
     return <Text>No access to location</Text>;
   }
-         
+
   const takePhotoCamera = async () => {
     if (cameraRef) {
       const picture = await cameraRef.takePictureAsync();
@@ -143,118 +183,158 @@ export const CreatePostScreen = ({ navigation }) => {
     setState(initialState)
   }
 
-  return (
-    <View style={styles.container}>
-      {isLoading &&
-        <ActivityIndicator size='large' style={styles.isloading} />
-      }
-      <View style={{ ...styles.cameraContainer, borderColor: state.photo ? '#000000' : '#E8E8E8' }}>
-        <Camera
-          style={styles.camera}
-          type={typeCamera}
-          autoFocus='auto'
-          flashMode='auto'
-          ref={(ref) => setCameraRef(ref)}
-        >
-          {/* Просмотр полученной фото */}
-          {state.photo && (
-            <View style={styles.previewContainer}>
-              <Image source={{ uri: state.photo }} style={styles.preview} />
-            </View>
-          )}
-          
-          {/* Кнопка смены фронт/тыл камеры */}
-          {!state.photo && (
-            <TouchableOpacity
-              style={styles.flipContainer}
-              onPress={() => {
-                setTypeCamera(
-                  typeCamera === Camera.Constants.Type.back
-                    ? Camera.Constants.Type.front
-                    : Camera.Constants.Type.back
-                );
-              }}
-            >
-              <Ionicons name='camera-reverse' size={24} color='black' />
-            </TouchableOpacity>
-          )}
+  const hideKeyboard = () => {
+    setShowKeyboard(false);
+    Keyboard.dismiss();
+  }
 
-          {/* Кнопка сделать фото */}
-          {!state.photo && (
+  return (
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.container}
+    >
+      <TouchableWithoutFeedback onPress={hideKeyboard}>
+        <View style={{ ...styles.inner, marginBottom: showKeyboard ? -200 : 0 }}>
+          {isLoading &&
+            <ActivityIndicator size='large' style={styles.isloading} />
+          }
+
+          <View style={{flex: 1}}>
+            <View style={{ ...styles.cameraContainer, borderColor: state.photo ? '#000000' : '#E8E8E8' }}>
+              <Camera
+                ref={(ref) => setCameraRef(ref)}
+                style={styles.camera}
+                autoFocus='auto'
+                flashMode='auto'
+                type={typeCamera}
+                ratio={ratioCamera}
+                pictureSize={pictureSizeCamera}
+              >
+                {/* Просмотр полученной фото */}
+                {state.photo && (
+                  <View style={styles.previewContainer}>
+                    <Image source={{ uri: state.photo }} style={styles.preview} />
+                  </View>
+                )}
+                
+                {!state.photo && (
+                  <View style={styles.btnsContainer}>
+                    {/* Кнопка смены фронт/тыл камеры */}
+                    <TouchableOpacity
+                      style={styles.flipContainer}
+                      onPress={() => {
+                        setTypeCamera(
+                          typeCamera === Camera.Constants.Type.back
+                          ? Camera.Constants.Type.front
+                          : Camera.Constants.Type.back
+                          );
+                        }}
+                        >
+                      <Ionicons name='camera-reverse' size={24} color='black' />
+                    </TouchableOpacity>
+                    {/* Кнопка смены пропорций фото */}
+                    <TouchableOpacity
+                      style={{ ...styles.ratioContainer, display: Platform.OS === 'ios' ? 'none' : 'flex' }}
+                      onPress={() => {
+                        setRatioCamera(
+                          ratioCamera === '4:3'
+                          ? '16:9'
+                          : '4:3'
+                        );
+                      }}
+                    >
+                      <Text>
+                        {ratioCamera}
+                      </Text>
+                    </TouchableOpacity>
+                    {/* Индикатор разрешения фото */}
+                    <View style={{ ...styles.sizeContainer, display: Platform.OS === 'ios' ? 'none' : 'flex' }}>
+                      <Text>
+                        {pictureSizeCamera}
+                      </Text>
+                    </View>
+                    {/* Кнопка сделать фото */}
+                    <TouchableOpacity
+                      onPress={takePhotoCamera}
+                      // style={{ ...styles.cameraBtnContainer, backgroundColor: state.photo ? 'rgba(255, 255, 255, 0.3)' : '#FFFFFF' }}
+                      style={{ ...styles.cameraBtnContainer, backgroundColor: state.photo ? '#FFFFFF30' : '#FFFFFF' }}
+                      activeOpacity={0.8}
+                    >
+                      <MaterialIcons name='camera-alt' size={24} color={state.photo ? '#FFFFFF' : '#BDBDBD'} style={styles.cameraBtnIcon} />
+                    </TouchableOpacity>
+                  </View>
+                )}
+              </Camera>
+            </View>
+
+            {!state.photo && (
+              <TouchableOpacity
+                onPress={takePhotoGallery}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.uploadEditButton}>
+                  Загрузить фото из галереи
+                </Text>
+              </TouchableOpacity>
+            )}
+
+            {state.photo && (
+              <TouchableOpacity
+                onPress={editPhoto}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.uploadEditButton}>
+                  Редактировать фото
+                </Text>
+              </TouchableOpacity>
+            )}
+
+            <TextInput
+              placeholder='Название...'
+              placeholderTextColor='#BDBDBD'
+              value={state.description}
+              onChangeText={descriptionInputHandler}
+              onFocus={() => setShowKeyboard(true)}
+              onBlur={() => setShowKeyboard(false)}
+              style={styles.inputDescription}
+            />
+
+            <View>
+              <Feather name='map-pin' size={24} color={'#BDBDBD'} style={styles.iconLocality} />
+              <TextInput
+                placeholder='Местность...'
+                placeholderTextColor='#BDBDBD'
+                value={state.locality}
+                onChangeText={localityInputHandler}
+                onFocus={() => setShowKeyboard(true)}
+                onBlur={() => setShowKeyboard(false)}
+                style={styles.inputLocality}
+              />
+            </View>
+
             <TouchableOpacity
-              onPress={takePhotoCamera}
-              // style={{ ...styles.cameraBtnContainer, backgroundColor: state.photo ? 'rgba(255, 255, 255, 0.3)' : '#FFFFFF' }}
-              style={{ ...styles.cameraBtnContainer, backgroundColor: state.photo ? '#FFFFFF30' : '#FFFFFF' }}
+              onPress={publishPhoto}
+              style={{ ...styles.publishBtnContainer, backgroundColor: state.photo ? '#FF6C00' : '#F6F6F6' }}
               activeOpacity={0.8}
             >
-              <MaterialIcons name='camera-alt' size={24} color={state.photo ? '#FFFFFF' : '#BDBDBD'} style={styles.cameraBtnIcon} />
+              <Text
+                style={{ ...styles.publishBtnTxt, color: state.photo ? '#ffffff' : '#BDBDBD' }}
+              >
+                Опубликовать
+              </Text>
             </TouchableOpacity>
-          )}
+          </View>
 
-        </Camera>
-      </View>
-
-      {!state.photo && (
-        <TouchableOpacity
-          onPress={takePhotoGallery}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.uploadEditButton}>
-            Загрузить фото из галереи
-          </Text>
-        </TouchableOpacity>
-      )}
-
-      {state.photo && (
-        <TouchableOpacity
-          onPress={editPhoto}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.uploadEditButton}>
-            Редактировать фото
-          </Text>
-        </TouchableOpacity>
-      )}
-
-      <TextInput
-        placeholder='Название...'
-        placeholderTextColor='#BDBDBD'
-        value={state.description}
-        onChangeText={descriptionInputHandler}
-        style={styles.inputDescription}
-      />
-
-      <View>
-        <Feather name='map-pin' size={24} color={'#BDBDBD'} style={styles.iconLocality} />
-        <TextInput
-          placeholder='Местность...'
-          placeholderTextColor='#BDBDBD'
-          value={state.locality}
-          onChangeText={localityInputHandler}
-          style={styles.inputLocality}
-        />
-      </View>
-
-      <TouchableOpacity
-        onPress={publishPhoto}
-        style={{ ...styles.publishBtnContainer, backgroundColor: state.photo ? '#FF6C00' : '#F6F6F6' }}
-        activeOpacity={0.8}
-      >
-        <Text
-          style={{ ...styles.publishBtnTxt, color: state.photo ? '#ffffff' : '#BDBDBD' }}
-        >
-          Опубликовать
-        </Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        onPress={deletePost}
-        style={styles.deleteBtnContainer}
-        activeOpacity={0.8}
-      >
-        <Feather name='trash-2' size={24} color='#BDBDBD' />          
-      </TouchableOpacity>
-    </View>
+          <TouchableOpacity
+            onPress={deletePost}
+            style={styles.deleteBtnContainer}
+            activeOpacity={0.8}
+          >
+            <Feather name='trash-2' size={24} color='#BDBDBD' />          
+          </TouchableOpacity>
+        </View>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   )
 };
 
@@ -268,14 +348,22 @@ const styles = StyleSheet.create({
     top: '50%',
     left: '50%',
   },
+  inner: {
+    flex: 1,
+    justifyContent: 'space-between',
+  },
+
   cameraContainer: {
+    flex: 1,
+
+    maxHeight: 240,
+    width: 320,
+
     borderWidth: 1,
     borderRadius: 8,
 
     overflow: 'hidden',
-
-    height: 240,
-    width: 320,
+    
     marginTop: 32,
     marginHorizontal: 16,
     marginLeft: "auto",
@@ -283,16 +371,42 @@ const styles = StyleSheet.create({
   },
   camera: {
     flex: 1,
-    // height: '70%',
-    
-    alignItems: 'center',
-    justifyContent: 'center'
   },
+
+  btnsContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+
   flipContainer: {
     position: 'absolute',
     top: 5,
     right: 10,
+    borderRadius: 10,
+    backgroundColor: '#ffffff',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
   },
+  ratioContainer: {
+    position: 'absolute',
+    bottom: 5,
+    left: 10,
+    borderRadius: 10,
+    backgroundColor: '#ffffff',
+    paddingHorizontal: 15,
+    paddingVertical: 5,
+  },
+  sizeContainer: {
+    position: 'absolute',
+    bottom: 5,
+    right: 10,
+    borderRadius: 10,
+    backgroundColor: '#ffffff',
+    paddingHorizontal: 15,
+    paddingVertical: 5,
+  },
+
   cameraBtnContainer: {
     borderRadius: 50,
     
@@ -313,6 +427,7 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24
   },
+
   previewContainer: {
     position: 'absolute',
     top: 0,
@@ -323,6 +438,7 @@ const styles = StyleSheet.create({
   preview: {
     flex: 1,
   },
+
   uploadEditButton: {
     fontSize: 16,
     lineHeight: 19,
@@ -361,6 +477,7 @@ const styles = StyleSheet.create({
     marginBottom: 32,
     marginHorizontal: 16,
   },
+
   publishBtnTxt: {
     fontSize: 16,
     lineHeight: 19,
@@ -374,17 +491,20 @@ const styles = StyleSheet.create({
     // height: 51,
     marginHorizontal: 16,
     marginTop: 16,
-    marginBottom: 120,
+    // marginBottom: 120,
 
     justifyContent: 'center',
     alignItems: 'center',
   },
+
   deleteBtnContainer: {
     borderRadius: 20,
     backgroundColor: '#F6F6F6',
 
     width: 70,
     height: 40,
+    marginBottom: 25,
+
     alignSelf: 'center',
 
     justifyContent: 'center',

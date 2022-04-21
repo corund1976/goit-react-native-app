@@ -9,6 +9,14 @@ import GoBackButton from '../components/GoBackButton';
 const MainTab = createBottomTabNavigator();
 
 export function MainTabNavigator() {
+
+  const showTab = route => {
+    if ((!getFocusedRouteNameFromRoute(route) && route.name === 'Home') || getFocusedRouteNameFromRoute(route) === 'Posts') {
+      return ('flex');
+    }
+    return ('none');
+  };
+
   return (
     <MainTab.Navigator
       initialRouteName={HomeScreen}
@@ -42,17 +50,19 @@ export function MainTabNavigator() {
         name='Home'
         component={HomeScreen}
         options={({ route }) => {
+          console.log('mainTabNavigator.js');
           console.log('HomeScreen route.name = ', route.name);
           console.log('getFocusedRouteNameFromRoute(route) = ', getFocusedRouteNameFromRoute(route));
           return {
             headerShown: false,
             tabBarStyle: {
-              display:
-                getFocusedRouteNameFromRoute(route) === 'Posts' ? 'flex' : 'none',
-              // route.name === 'Home' ? 'flex' : 'none',
+              display: showTab(route),
+              height: 70,
+              paddingVertical: 15,
+              paddingHorizontal: 50,
             },
             tabBarIcon: ({ focused, size, color }) => (
-              <Ionicons name="grid-outline" size={24} color={color} />
+              <Ionicons name='grid-outline' size={24} color={color} />
             ),
           }
         }}
@@ -65,9 +75,9 @@ export function MainTabNavigator() {
           headerLeft: () => (
             <GoBackButton />
           ),
-          tabBarStyle: { display: "none" },
+          tabBarStyle: { display: 'none' },
           tabBarIcon: ({ focused, size, color }) => (
-            <Ionicons name="add-outline" size={24} color={color} />
+            <Ionicons name='add-outline' size={24} color={color} />
           ),
         }}
       />
@@ -76,8 +86,13 @@ export function MainTabNavigator() {
         component={ProfileScreen}
         options={{
           headerShown: false,
+          tabBarStyle: {
+            height: 70,
+            paddingVertical: 15,
+            paddingHorizontal: 50,
+          },
           tabBarIcon: ({ focused, size, color }) => (
-            <Feather name="user" size={24} color={color} />
+            <Feather name='user' size={24} color={color} />
           ),
         }}
       />
