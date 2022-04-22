@@ -12,6 +12,7 @@ import {
   Image,
   ActivityIndicator
 } from 'react-native';
+import { useIsFocused } from '@react-navigation/native';
 import { Camera } from 'expo-camera';
 import * as Location from 'expo-location';
 import * as ImagePicker from 'expo-image-picker';
@@ -21,7 +22,7 @@ import { collection, addDoc } from "firebase/firestore";
 
 import uploadImageToStorage from '../../helpers/uploadImage'
 import { db } from '../../firebase/config';
-import { calculateBackoffMillis } from '@firebase/util';
+// import { calculateBackoffMillis } from '@firebase/util';
 
 const initialState = {
   photo: null,
@@ -31,6 +32,8 @@ const initialState = {
 
 export const CreatePostScreen = ({ navigation }) => {
   console.log('********CreateScreen**********');
+  const isFocused = useIsFocused();
+  const { userId, userName } = useSelector(state => state.auth);
 
   const [state, setState] = useState(initialState);
 
@@ -48,8 +51,6 @@ export const CreatePostScreen = ({ navigation }) => {
 
   const [showKeyboard, setShowKeyboard] = useState(false);
      
-  const { userId, userName } = useSelector(state => state.auth);
-
   const getSupportedRatios = async () => {
     if (Platform.OS == 'android') {
       const supportedRatios = await cameraRef.getSupportedRatiosAsync();
@@ -201,6 +202,7 @@ export const CreatePostScreen = ({ navigation }) => {
 
           <View style={{flex: 1}}>
             <View style={{ ...styles.cameraContainer, borderColor: state.photo ? '#000000' : '#E8E8E8' }}>
+              {isFocused &&
               <Camera
                 ref={(ref) => setCameraRef(ref)}
                 style={styles.camera}
@@ -265,6 +267,7 @@ export const CreatePostScreen = ({ navigation }) => {
                   </View>
                 )}
               </Camera>
+              }
             </View>
 
             {!state.photo && (
