@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   StyleSheet,
   View,
@@ -22,7 +22,6 @@ import { collection, addDoc } from "firebase/firestore";
 
 import uploadImageToStorage from '../../helpers/uploadImage'
 import { db } from '../../firebase/config';
-// import { calculateBackoffMillis } from '@firebase/util';
 
 const initialState = {
   photo: null,
@@ -32,29 +31,32 @@ const initialState = {
 
 export const CreatePostScreen = ({ navigation }) => {
   console.log('********CreateScreen**********');
-  const isFocused = useIsFocused();
   const { userId, userName } = useSelector(state => state.auth);
+  const isFocused = useIsFocused();
+  const cameraRef = useRef(null);
+  // const [cameraRef, setCameraRef] = useState(null);
 
-  const [state, setState] = useState(initialState);
+  const [startCamera, setStartCamera] = useState(true);
 
   const [hasPermissionCamera, setHasPermissionCamera] = useState(null);
   const [hasPermissionLocation, setHasPermissionLocation] = useState(null);
 
-  const [cameraRef, setCameraRef] = useState(null);
   const [typeCamera, setTypeCamera] = useState(Camera.Constants.Type.back);
   const [availableRatios, setAvailableRatios] = useState([]);
   const [ratioCamera, setRatioCamera] = useState('4:3');
   const [availablePictureSizes, setAvailablePictureSizes] = useState([]);
   const [pictureSizeCamera, setPictureSizeCamera] = useState('640x480');
-  
+
+  const [state, setState] = useState(initialState);
+ 
   const [isLoading, setIsLoading] = useState(false);
 
   const [showKeyboard, setShowKeyboard] = useState(false);
-     
+   
   const getSupportedRatios = async () => {
     if (Platform.OS == 'android') {
       const supportedRatios = await cameraRef.getSupportedRatiosAsync();
-      console.log('#76 SupportedRatios', supportedRatios);
+      // console.log('#76 SupportedRatios', supportedRatios);
       setAvailableRatios(supportedRatios);
     }
   };
@@ -67,18 +69,15 @@ export const CreatePostScreen = ({ navigation }) => {
 
       setAvailablePictureSizes(availablePictureSizes);
 
-      console.log('#86 availablePictureSizes', availablePictureSizes);
+      // console.log('#86 availablePictureSizes', availablePictureSizes);
 
       setPictureSizeCamera(availablePictureSizes[0])
 
-      console.log('PictureSize=', availablePictureSizes[0]);
+      // console.log('PictureSize=', availablePictureSizes[0]);
     }
   };
 
-  useEffect(() => {
-    getSupportedRatios();
-    getAvailablePictureSizes();
-    
+  useEffect(() => {  
     (async () => {
       console.log('createPost useEffect');
 
@@ -89,6 +88,11 @@ export const CreatePostScreen = ({ navigation }) => {
       setHasPermissionLocation(locationPermission.status === 'granted');
 
     })();
+  }, []);
+
+  useEffect(() => {
+    getSupportedRatios();
+    getAvailablePictureSizes();
   }, [ratioCamera]);
 
   if (hasPermissionCamera === null) {
@@ -107,13 +111,22 @@ export const CreatePostScreen = ({ navigation }) => {
 
   const takePhotoCamera = async () => {
     if (cameraRef) {
-      const picture = await cameraRef.takePictureAsync();
+      const options = {
+        quality: 0.8,
+        base64: true,
+        fixOrientation: true, 
+        exif: true
+      };
+      const picture = await cameraRef.current.takePictureAsync(options);
+      // const picture = await cameraRef.takePictureAsync(options);
 
       setState(prevState => ({ ...prevState, photo: picture.uri }));
+      setStartCamera(false);
     }
   }
 
   const takePhotoGallery = async () => {
+    setStartCamera(false);
     // No permissions request is necessary for launching the image library
     let imageFromGallery = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -129,6 +142,7 @@ export const CreatePostScreen = ({ navigation }) => {
 
   const editPhoto = () => {
     setState(prevState => ({ ...prevState, photo: null }));
+    setStartCamera(true);
   }
 
   const descriptionInputHandler = (text) => {
@@ -143,9 +157,9 @@ export const CreatePostScreen = ({ navigation }) => {
     await uploadPostToServer();
 
     if (!isLoading) {
-      console.log('Redirecting to Posts !!!');
       navigation.navigate('Posts');
       setState(initialState);
+      setStartCamera(true);
     }
   }
 
@@ -181,7 +195,8 @@ export const CreatePostScreen = ({ navigation }) => {
   };
   
   const deletePost = () => {
-    setState(initialState)
+    setState(initialState);
+    setStartCamera(true)
   }
 
   const hideKeyboard = () => {
@@ -200,26 +215,22 @@ export const CreatePostScreen = ({ navigation }) => {
             <ActivityIndicator size='large' style={styles.isloading} />
           }
 
-          <View style={{flex: 1}}>
+          <View style={{ flex: 1 }}>
+            
             <View style={{ ...styles.cameraContainer, borderColor: state.photo ? '#000000' : '#E8E8E8' }}>
-              {isFocused &&
-              <Camera
-                ref={(ref) => setCameraRef(ref)}
-                style={styles.camera}
-                autoFocus='auto'
-                flashMode='auto'
-                type={typeCamera}
-                ratio={ratioCamera}
-                pictureSize={pictureSizeCamera}
-              >
-                {/* Просмотр полученной фото */}
-                {state.photo && (
-                  <View style={styles.previewContainer}>
-                    <Image source={{ uri: state.photo }} style={styles.preview} />
-                  </View>
-                )}
-                
-                {!state.photo && (
+              {/* Камера контейнер */}
+              {startCamera && isFocused &&
+                <Camera
+                  ref={cameraRef}
+                  // ref={(camRef) => setCameraRef(camRef)}
+                  style={styles.camera}
+                  autoFocus='auto'
+                  flashMode='auto'
+                  type={typeCamera}
+                  ratio={ratioCamera}
+                  pictureSize={pictureSizeCamera}
+                >
+                  {/* Кнопки управления камерой */}
                   <View style={styles.btnsContainer}>
                     {/* Кнопка смены фронт/тыл камеры */}
                     <TouchableOpacity
@@ -227,21 +238,22 @@ export const CreatePostScreen = ({ navigation }) => {
                       onPress={() => {
                         setTypeCamera(
                           typeCamera === Camera.Constants.Type.back
-                          ? Camera.Constants.Type.front
-                          : Camera.Constants.Type.back
-                          );
-                        }}
-                        >
-                      <Ionicons name='camera-reverse' size={24} color='black' />
+                            ? Camera.Constants.Type.front
+                            : Camera.Constants.Type.back
+                        );
+                      }}
+                    >
+                      <Ionicons name='camera-reverse' size={24} color={'black'} />
                     </TouchableOpacity>
+                  
                     {/* Кнопка смены пропорций фото */}
                     <TouchableOpacity
                       style={{ ...styles.ratioContainer, display: Platform.OS === 'ios' ? 'none' : 'flex' }}
                       onPress={() => {
                         setRatioCamera(
                           ratioCamera === '4:3'
-                          ? '16:9'
-                          : '4:3'
+                            ? '16:9'
+                            : '4:3'
                         );
                       }}
                     >
@@ -249,12 +261,14 @@ export const CreatePostScreen = ({ navigation }) => {
                         {ratioCamera}
                       </Text>
                     </TouchableOpacity>
+
                     {/* Индикатор разрешения фото */}
                     <View style={{ ...styles.sizeContainer, display: Platform.OS === 'ios' ? 'none' : 'flex' }}>
                       <Text>
                         {pictureSizeCamera}
                       </Text>
                     </View>
+
                     {/* Кнопка сделать фото */}
                     <TouchableOpacity
                       onPress={takePhotoCamera}
@@ -265,11 +279,18 @@ export const CreatePostScreen = ({ navigation }) => {
                       <MaterialIcons name='camera-alt' size={24} color={state.photo ? '#FFFFFF' : '#BDBDBD'} style={styles.cameraBtnIcon} />
                     </TouchableOpacity>
                   </View>
-                )}
-              </Camera>
+                </Camera>
+              }
+
+              {/* Превью контейнер */}
+              {state.photo &&
+                <View style={styles.previewContainer}>
+                  <Image source={{ uri: state.photo }} style={styles.preview} />
+                </View>
               }
             </View>
 
+            {/* Блок под превью/камерой */}
             {!state.photo && (
               <TouchableOpacity
                 onPress={takePhotoGallery}
@@ -367,7 +388,7 @@ const styles = StyleSheet.create({
 
     overflow: 'hidden',
     
-    marginTop: 32,
+    // marginTop: 32,
     marginHorizontal: 16,
     marginLeft: "auto",
     marginRight: 'auto',
@@ -432,11 +453,26 @@ const styles = StyleSheet.create({
   },
 
   previewContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
+    flex: 1,
+
+    // maxHeight: 240,
+    width: 320,
+
+    borderWidth: 1,
+    borderRadius: 8,
+
+    overflow: 'hidden',
+    
+    // marginTop: 32,
+    marginHorizontal: 16,
+    marginLeft: "auto",
+    marginRight: 'auto',
+
+    // position: 'absolute',
+    // top: 0,
+    // left: 0,
+    // width: '100%',
+    // height: '100%',
   },
   preview: {
     flex: 1,
