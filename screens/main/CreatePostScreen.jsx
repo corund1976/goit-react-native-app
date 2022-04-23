@@ -33,8 +33,8 @@ export const CreatePostScreen = ({ navigation }) => {
   console.log('********CreateScreen**********');
   const { userId, userName } = useSelector(state => state.auth);
   const isFocused = useIsFocused();
-  const cameraRef = useRef(null);
-  // const [cameraRef, setCameraRef] = useState(null);
+  // const cameraRef = useRef(null);
+  const [cameraRef, setCameraRef] = useState(null);
 
   const [startCamera, setStartCamera] = useState(true);
 
@@ -117,8 +117,8 @@ export const CreatePostScreen = ({ navigation }) => {
         fixOrientation: true, 
         exif: true
       };
-      const picture = await cameraRef.current.takePictureAsync(options);
-      // const picture = await cameraRef.takePictureAsync(options);
+      // const picture = await cameraRef.current.takePictureAsync(options);
+      const picture = await cameraRef.takePictureAsync(options);
 
       setState(prevState => ({ ...prevState, photo: picture.uri }));
       setStartCamera(false);
@@ -134,9 +134,11 @@ export const CreatePostScreen = ({ navigation }) => {
       aspect: [4, 3],
       quality: 1,
     });
-
+    
     if (!imageFromGallery.cancelled) {
       setState(prevState => ({ ...prevState, photo: imageFromGallery.uri }));
+    } else {
+      setStartCamera(true);
     }
   };
 
@@ -221,8 +223,8 @@ export const CreatePostScreen = ({ navigation }) => {
               {/* Камера контейнер */}
               {startCamera && isFocused &&
                 <Camera
-                  ref={cameraRef}
-                  // ref={(camRef) => setCameraRef(camRef)}
+                  // ref={cameraRef}
+                  ref={(camRef) => setCameraRef(camRef)}
                   style={styles.camera}
                   autoFocus='auto'
                   flashMode='auto'
