@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   TouchableOpacity,
@@ -36,7 +36,7 @@ export function PostsList({ posts }) {
   return (
     <FlatList
       data={posts}
-      numColumns={ (windowWidth > windowHeight) ? 2 : 1}
+      numColumns={1}
       keyExtractor={(item, index) => index.toString()}
       renderItem={({ item }) => (
         <View style={styles.listItem}>

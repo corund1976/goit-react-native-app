@@ -16,6 +16,7 @@ import { useIsFocused } from '@react-navigation/native';
 import { Camera } from 'expo-camera';
 import * as Location from 'expo-location';
 import * as ImagePicker from 'expo-image-picker';
+import { manipulateAsync, FlipType, SaveFormat } from 'expo-image-manipulator';
 import { Feather, MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { useSelector } from 'react-redux';
 import { collection, addDoc } from "firebase/firestore";
@@ -33,9 +34,8 @@ export const CreatePostScreen = ({ navigation }) => {
   console.log('********CreateScreen**********');
   const { userId, userName } = useSelector(state => state.auth);
   const isFocused = useIsFocused();
-  // const cameraRef = useRef(null);
-  const [cameraRef, setCameraRef] = useState(null);
 
+  const [cameraRef, setCameraRef] = useState(null);
   const [startCamera, setStartCamera] = useState(true);
 
   const [hasPermissionCamera, setHasPermissionCamera] = useState(null);
@@ -112,15 +112,35 @@ export const CreatePostScreen = ({ navigation }) => {
   const takePhotoCamera = async () => {
     if (cameraRef) {
       const options = {
-        quality: 0.8,
-        base64: true,
-        fixOrientation: true, 
-        exif: true
+        // quality: 1,
+        // base64: true,
+        exif: true,
+        skipProcessing: true,
       };
-      // const picture = await cameraRef.current.takePictureAsync(options);
       const picture = await cameraRef.takePictureAsync(options);
+      // console.log('exif', picture.exif);
 
-      setState(prevState => ({ ...prevState, photo: picture.uri }));
+      if (typeCamera === Camera.Constants.Type.front) {
+        const manipResult = await manipulateAsync(
+          picture.localUri || picture.uri,
+          [
+            { rotate: 180 },
+            { flip: FlipType.Vertical },
+          ],
+          { compress: 0.6, format: SaveFormat.PNG }
+        );
+        setState(prevState => ({ ...prevState, photo: manipResult.uri }));
+      };
+
+      if (typeCamera === Camera.Constants.Type.back) {
+        const manipResult = await manipulateAsync(
+          picture.uri,
+          [],
+          { format: SaveFormat.PNG }
+        );
+        setState(prevState => ({ ...prevState, photo: manipResult.uri }));
+      };
+
       setStartCamera(false);
     }
   }
@@ -223,7 +243,6 @@ export const CreatePostScreen = ({ navigation }) => {
               {/* Камера контейнер */}
               {startCamera && isFocused &&
                 <Camera
-                  // ref={cameraRef}
                   ref={(camRef) => setCameraRef(camRef)}
                   style={styles.camera}
                   autoFocus='auto'
@@ -465,16 +484,9 @@ const styles = StyleSheet.create({
 
     overflow: 'hidden',
     
-    // marginTop: 32,
     marginHorizontal: 16,
     marginLeft: "auto",
     marginRight: 'auto',
-
-    // position: 'absolute',
-    // top: 0,
-    // left: 0,
-    // width: '100%',
-    // height: '100%',
   },
   preview: {
     flex: 1,
