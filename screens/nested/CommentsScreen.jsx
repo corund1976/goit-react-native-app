@@ -183,6 +183,7 @@ export function CommentsScreen({ route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#ffffff'
   },
   inner: {
     flex: 1,

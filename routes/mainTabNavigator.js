@@ -72,6 +72,7 @@ export function MainTabNavigator() {
         component={CreatePostScreen}
         options={{
           title: 'Создать публикацию',
+          headerStyle: { borderBottomColor: '#B3B3B3', borderBottomWidth: 1 },
           headerLeft: () => (
             <GoBackButton />
           ),

@@ -208,7 +208,8 @@ export const CreatePostScreen = ({ navigation }) => {
       userId,
       userName,
       comments: [],
-      likes: []
+      likes: [],
+      date: Date.now().toString(),
     }
 
     console.log('!!!! created new Post');
@@ -421,7 +422,7 @@ const styles = StyleSheet.create({
 
     overflow: 'hidden',
     
-    // marginTop: 32,
+    marginTop: 32,
     marginHorizontal: 16,
     marginLeft: "auto",
     marginRight: 'auto',
@@ -429,12 +430,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+
   camera: {
     height: 240,
-    width: 180,
+    width: 180, //'100%'
     marginLeft: "auto",
     marginRight: 'auto',
-    // flex: 1,
+    flex: 1,
   },
 
   flipBtn: {

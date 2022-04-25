@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import { useSelector } from 'react-redux';
-import { collection, onSnapshot, query } from 'firebase/firestore';
+import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 
 import { db } from '../../firebase/config';
 import { PostsList } from '../../components';
@@ -14,7 +14,7 @@ export function PostsScreen () {
   const [posts, setPosts] = useState([])
   
   const getAllPosts = async () => {
-    const q = query(collection(db, 'posts'));
+    const q = query(collection(db, 'posts'), orderBy('date', 'desc'));
     
     onSnapshot(q, (querySnapshot) => {
       setPosts(querySnapshot.docs.map(doc => ({ ...doc.data(), postId: doc.id, })))
@@ -65,7 +65,9 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     // justifyContent: 'center',
+
     paddingHorizontal: 16,
+
     backgroundColor: '#ffffff'
   },
   user: {
@@ -85,14 +87,16 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   userInfoName: {
-    fontWeight: 'bold',
+    fontFamily: 'Roboto-Bold',
+    // fontWeight: 'bold',
     fontSize: 13,
     lineHeight: 15,
 
     color: '#212121',
   },
   userInfoEmail: {
-    fontWeight: 'normal',
+    fontFamily: 'Roboto-Regular',
+    // fontWeight: 'normal',
     fontSize: 11,
     lineHeight: 13,
 
