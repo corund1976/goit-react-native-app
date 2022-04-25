@@ -251,57 +251,60 @@ export const CreatePostScreen = ({ navigation }) => {
                   ratio={ratioCamera}
                   pictureSize={pictureSizeCamera}
                 >
-                  {/* Кнопки управления камерой */}
-                  <View style={styles.btnsContainer}>
-                    {/* Кнопка смены фронт/тыл камеры */}
-                    <TouchableOpacity
-                      style={styles.flipContainer}
-                      onPress={() => {
-                        setTypeCamera(
-                          typeCamera === Camera.Constants.Type.back
-                            ? Camera.Constants.Type.front
-                            : Camera.Constants.Type.back
-                        );
-                      }}
-                    >
-                      <Ionicons name='camera-reverse' size={24} color={'black'} />
-                    </TouchableOpacity>
-                  
-                    {/* Кнопка смены пропорций фото */}
-                    <TouchableOpacity
-                      style={{ ...styles.ratioContainer, display: Platform.OS === 'ios' ? 'none' : 'flex' }}
-                      onPress={() => {
-                        setRatioCamera(
-                          ratioCamera === '4:3'
-                            ? '16:9'
-                            : '4:3'
-                        );
-                      }}
-                    >
-                      <Text>
-                        {ratioCamera}
-                      </Text>
-                    </TouchableOpacity>
-
-                    {/* Индикатор разрешения фото */}
-                    <View style={{ ...styles.sizeContainer, display: Platform.OS === 'ios' ? 'none' : 'flex' }}>
-                      <Text>
-                        {pictureSizeCamera}
-                      </Text>
-                    </View>
-
-                    {/* Кнопка сделать фото */}
-                    <TouchableOpacity
-                      onPress={takePhotoCamera}
-                      // style={{ ...styles.cameraBtnContainer, backgroundColor: state.photo ? 'rgba(255, 255, 255, 0.3)' : '#FFFFFF' }}
-                      style={{ ...styles.cameraBtnContainer, backgroundColor: state.photo ? '#FFFFFF30' : '#FFFFFF' }}
-                      activeOpacity={0.8}
-                    >
-                      <MaterialIcons name='camera-alt' size={24} color={state.photo ? '#FFFFFF' : '#BDBDBD'} style={styles.cameraBtnIcon} />
-                    </TouchableOpacity>
-                  </View>
                 </Camera>
               }
+
+              {/* Кнопка смены фронт/тыл камеры */}
+              <TouchableOpacity
+                style={styles.flipBtn}
+                onPress={() => {
+                  setTypeCamera(
+                    typeCamera === Camera.Constants.Type.back
+                      ? Camera.Constants.Type.front
+                      : Camera.Constants.Type.back
+                  );
+                }}
+              >
+                <Ionicons name='camera-reverse' size={24} color={'black'} />
+              </TouchableOpacity>
+
+              {/* Кнопка смены пропорций фото */}
+              <TouchableOpacity
+                style={{
+                  ...styles.ratioBtn,
+                  display: Platform.OS === 'ios' ? 'none' : 'flex'
+                }}
+                onPress={() => {
+                  setRatioCamera(ratioCamera === '4:3' ? '16:9' : '4:3')
+                }}
+              >
+                <Text>{ratioCamera}</Text>
+              </TouchableOpacity>
+
+              {/* Индикатор разрешения фото */}
+              <View style={{
+                ...styles.sizeIndicator,
+                display: Platform.OS === 'ios' ? 'none' : 'flex'
+              }}>
+                <Text>
+                  {pictureSizeCamera}
+                </Text>
+              </View>
+
+              {/* Кнопка сделать фото */}
+              <TouchableOpacity
+                onPress={takePhotoCamera}
+                // style={{ ...styles.cameraBtnContainer, backgroundColor: state.photo ? 'rgba(255, 255, 255, 0.3)' : '#FFFFFF' }}
+                style={{ ...styles.snapBtn, backgroundColor: state.photo ? '#FFFFFF30' : '#FFFFFF' }}
+                activeOpacity={0.8}
+              >
+                <MaterialIcons
+                  name='camera-alt'
+                  size={24}
+                  color={state.photo ? '#FFFFFF' : '#BDBDBD'}
+                  style={styles.snapIcon}
+                />
+              </TouchableOpacity>
 
               {/* Превью контейнер */}
               {state.photo &&
@@ -413,9 +416,16 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginLeft: "auto",
     marginRight: 'auto',
+
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   camera: {
-    flex: 1,
+    height: 240,
+    width: 180,
+    marginLeft: "auto",
+    marginRight: 'auto',
+    // flex: 1,
   },
 
   btnsContainer: {
@@ -424,35 +434,37 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
 
-  flipContainer: {
+  flipBtn: {
     position: 'absolute',
     top: 5,
     right: 10,
     borderRadius: 10,
-    backgroundColor: '#ffffff',
+    backgroundColor: 'lightgrey',
     paddingHorizontal: 10,
     paddingVertical: 5,
   },
-  ratioContainer: {
+  ratioBtn: {
     position: 'absolute',
     bottom: 5,
     left: 10,
     borderRadius: 10,
-    backgroundColor: '#ffffff',
+    backgroundColor: 'lightgrey',
     paddingHorizontal: 15,
     paddingVertical: 5,
   },
-  sizeContainer: {
+  sizeIndicator: {
     position: 'absolute',
     bottom: 5,
     right: 10,
     borderRadius: 10,
-    backgroundColor: '#ffffff',
+    backgroundColor: 'lightgrey',
     paddingHorizontal: 15,
     paddingVertical: 5,
   },
 
-  cameraBtnContainer: {
+  snapBtn: {
+    position: 'absolute',
+
     borderRadius: 50,
     
     width: 60,
@@ -461,7 +473,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  cameraBtnIcon: {
+  snapIcon: {
     shadowOffset: {
       width: 0,
       height: 4,
