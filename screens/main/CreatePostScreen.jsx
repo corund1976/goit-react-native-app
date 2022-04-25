@@ -124,7 +124,7 @@ export const CreatePostScreen = ({ navigation }) => {
         const manipResult = await manipulateAsync(
           picture.localUri || picture.uri,
           [
-            { rotate: 180 },
+            { rotate: Platform.OS === 'ios' ? 270 : 180 },
             { flip: FlipType.Vertical },
           ],
           { compress: 0.6, format: SaveFormat.PNG }
@@ -135,7 +135,9 @@ export const CreatePostScreen = ({ navigation }) => {
       if (typeCamera === Camera.Constants.Type.back) {
         const manipResult = await manipulateAsync(
           picture.uri,
-          [],
+          [
+            { rotate: Platform.OS === 'ios' ? 270 : 0 },
+          ],
           { format: SaveFormat.PNG }
         );
         setState(prevState => ({ ...prevState, photo: manipResult.uri }));
@@ -232,14 +234,20 @@ export const CreatePostScreen = ({ navigation }) => {
       style={styles.container}
     >
       <TouchableWithoutFeedback onPress={hideKeyboard}>
-        <View style={{ ...styles.inner, marginBottom: showKeyboard ? -200 : 0 }}>
+        <View style={{
+          ...styles.inner,
+          marginBottom: showKeyboard ? -200 : 0
+        }}>
           {isLoading &&
             <ActivityIndicator size='large' style={styles.isloading} />
           }
 
           <View style={{ flex: 1 }}>
             
-            <View style={{ ...styles.cameraContainer, borderColor: state.photo ? '#000000' : '#E8E8E8' }}>
+            <View style={{
+              ...styles.pictureContainer, 
+              borderColor: state.photo ? '#000000' : '#E8E8E8'
+            }}>
               {/* Камера контейнер */}
               {startCamera && isFocused &&
                 <Camera
@@ -295,7 +303,10 @@ export const CreatePostScreen = ({ navigation }) => {
               <TouchableOpacity
                 onPress={takePhotoCamera}
                 // style={{ ...styles.cameraBtnContainer, backgroundColor: state.photo ? 'rgba(255, 255, 255, 0.3)' : '#FFFFFF' }}
-                style={{ ...styles.snapBtn, backgroundColor: state.photo ? '#FFFFFF30' : '#FFFFFF' }}
+                style={{
+                  ...styles.snapBtn,
+                  backgroundColor: state.photo ? '#FFFFFF30' : '#FFFFFF'
+                }}
                 activeOpacity={0.8}
               >
                 <MaterialIcons
@@ -308,9 +319,7 @@ export const CreatePostScreen = ({ navigation }) => {
 
               {/* Превью контейнер */}
               {state.photo &&
-                <View style={styles.previewContainer}>
-                  <Image source={{ uri: state.photo }} style={styles.preview} />
-                </View>
+                <Image source={{ uri: state.photo }} style={styles.preview} />
               }
             </View>
 
@@ -401,7 +410,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
 
-  cameraContainer: {
+  pictureContainer: {
     flex: 1,
 
     maxHeight: 240,
@@ -426,12 +435,6 @@ const styles = StyleSheet.create({
     marginLeft: "auto",
     marginRight: 'auto',
     // flex: 1,
-  },
-
-  btnsContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center'
   },
 
   flipBtn: {
@@ -461,7 +464,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 5,
   },
-
   snapBtn: {
     position: 'absolute',
 
@@ -485,23 +487,10 @@ const styles = StyleSheet.create({
     height: 24
   },
 
-  previewContainer: {
-    flex: 1,
-
-    // maxHeight: 240,
-    width: 320,
-
-    borderWidth: 1,
-    borderRadius: 8,
-
-    overflow: 'hidden',
-    
-    marginHorizontal: 16,
-    marginLeft: "auto",
-    marginRight: 'auto',
-  },
   preview: {
     flex: 1,
+    maxHeight: 240,
+    width: 320,
   },
 
   uploadEditButton: {
