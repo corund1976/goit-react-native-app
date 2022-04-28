@@ -177,27 +177,12 @@ export const CreatePostScreen = ({ navigation }) => {
     setState((prevState) => ({ ...prevState, locality: text, }))
   }
 
-  const publishPhoto = async () => {
-    await uploadPostToServer();
-
-    if (!isLoading) {
-      navigation.navigate('Posts');
-      setState(initialState);
-      setStartCamera(true);
-    }
-  }
-
-  const uploadPostToServer = async () => {
+  const publishPost = async () => {
     setIsLoading(true);
 
     const { photo, description, locality } = state;
     const photoURL = await uploadImageToStorage(photo, 'images/');
-
-    console.log('!!!! start getting geolocation !!!!');
-
     const { coords: { latitude, longitude } } = await Location.getCurrentPositionAsync({});
-
-    console.log('!!!! geolocation is ready !!!!');
 
     const newPost = {
       photo: photoURL,
@@ -212,11 +197,14 @@ export const CreatePostScreen = ({ navigation }) => {
       date: Date.now().toString(),
     }
 
-    console.log('!!!! created new Post');
     await addDoc(collection(db, "posts"), newPost);    
-    
     setIsLoading(false);
-    console.log('!!!! post uploaded to Firebase');
+
+    if (!isLoading) {
+      navigation.navigate('Posts');
+      setState(initialState);
+      setStartCamera(true);
+    }
   };
   
   const deletePost = () => {
@@ -371,7 +359,7 @@ export const CreatePostScreen = ({ navigation }) => {
             </View>
 
             <TouchableOpacity
-              onPress={publishPhoto}
+              onPress={publishPost}
               style={{ ...styles.publishBtnContainer, backgroundColor: state.photo ? '#FF6C00' : '#F6F6F6' }}
               activeOpacity={0.8}
             >
